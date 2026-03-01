@@ -44,7 +44,10 @@ export default function Session() {
 
   const [restDialog, setRestDialog] = useState(null);
   const [restingId, setRestingId] = useState(null);
-  const [triggerEndSession, setTriggerEndSession] = useState(null);
+  const [endSessionDialog, setEndSessionDialog] = useState(false);
+  const [episodeTitle, setEpisodeTitle] = useState('');
+  const [episodeRecap, setEpisodeRecap] = useState('');
+  const [closingSession, setClosingSession] = useState(false);
 
   const navigate = useNavigate();
   const urlParams = new URLSearchParams(window.location.search);
