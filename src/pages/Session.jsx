@@ -192,7 +192,10 @@ export default function Session() {
     if (!isDM || !activeSession) return;
     setClosingSession(true);
     try {
-      const allEpisodes = await base44.entities.Episode.filter({ campaign_id: campaignId });
+      const [allEpisodes, sessionLogs] = await Promise.all([
+        base44.entities.Episode.filter({ campaign_id: campaignId }),
+        base44.entities.SessionLog.filter({ campaign_id: campaignId, session_id: activeSession.id }),
+      ]);
       const nextEpisodeNum = (allEpisodes.length > 0 ? Math.max(...allEpisodes.map(e => e.episode_number || 0)) : 0) + 1;
       const today = new Date().toISOString().split('T')[0];
       const sessionIdToClose = activeSession.id;
@@ -205,6 +208,7 @@ export default function Session() {
         status: 'completed',
         recap: episodeRecap || '',
         participant_ids: [],
+        session_log: sessionLogs.map(l => ({ timestamp: l.created_date, type: l.entry_type, user_id: l.user_id, content: l.content })),
       });
       await base44.entities.ActiveSession.update(sessionIdToClose, { status: 'closed', session_end: new Date().toISOString() });
 
