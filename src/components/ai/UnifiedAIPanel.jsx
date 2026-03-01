@@ -541,17 +541,37 @@ export default function UnifiedAIPanel({
       </div>
 
       <div className="p-3 border-t border-slate-800 flex-shrink-0">
+        {isAIDM && (
+          <div className="flex items-center gap-2 mb-2">
+            <button
+              onClick={() => setOocMode(p => !p)}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all border ${
+                oocMode
+                  ? 'bg-slate-600 border-slate-400 text-white'
+                  : 'bg-transparent border-slate-700 text-slate-500 hover:border-slate-500 hover:text-slate-400'
+              }`}
+            >
+              <MessageCircle className="h-3 w-3" />
+              {oocMode ? 'Out of character' : 'In character'}
+            </button>
+            {oocMode && <span className="text-[10px] text-slate-500">DM will answer you directly, outside the roleplay</span>}
+          </div>
+        )}
         <div className="flex gap-2">
           <Textarea
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-            placeholder={isAIDM ? 'Describe your action... (Enter to send)' : 'Ask about lore, rules, documents... (Enter to send)'}
+            placeholder={
+              oocMode && isAIDM
+                ? 'Ask the DM directly (out of character)...'
+                : isAIDM ? 'Describe your action... (Enter to send)' : 'Ask about lore, rules, documents... (Enter to send)'
+            }
             disabled={loading}
-            className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 text-xs min-h-[52px] resize-none"
+            className={`bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 text-xs min-h-[52px] resize-none ${oocMode ? 'border-slate-500' : ''}`}
           />
           <Button onClick={sendMessage} disabled={loading || !input.trim()}
-            className={`flex-shrink-0 self-end ${isAIDM ? 'bg-violet-600 hover:bg-violet-700' : 'bg-amber-600 hover:bg-amber-700'}`}>
+            className={`flex-shrink-0 self-end ${oocMode ? 'bg-slate-600 hover:bg-slate-500' : isAIDM ? 'bg-violet-600 hover:bg-violet-700' : 'bg-amber-600 hover:bg-amber-700'}`}>
             {loading ? <Loader className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           </Button>
         </div>
