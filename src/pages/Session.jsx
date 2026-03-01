@@ -55,6 +55,7 @@ export default function Session() {
   const [episodeTitle, setEpisodeTitle] = useState('');
   const [episodeRecap, setEpisodeRecap] = useState('');
   const [closingSession, setClosingSession] = useState(false);
+  const [selectedEpisodeLogs, setSelectedEpisodeLogs] = useState(null);
 
   const navigate = useNavigate();
   const urlParams = new URLSearchParams(window.location.search);
