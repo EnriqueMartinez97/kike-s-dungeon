@@ -84,7 +84,12 @@ export default function Session() {
         base44.entities.Quest.filter({ campaign_id: campaignId }),
         base44.entities.Episode.filter({ campaign_id: campaignId }),
         base44.entities.ActiveSession.filter({ campaign_id: campaignId, status: 'active' }),
-        base44.entities.Document.filter({ campaign_id: campaignId }).catch(() => []),
+        base44.entities.Document.list().then(allDocs => 
+          allDocs.filter(d => 
+            (d.campaign_ids?.includes(campaignId) || d.campaign_id === campaignId) &&
+            (d.access_level === 'player_visible' || d.owner_id === currentUser.id)
+          )
+        ).catch(() => []),
       ]);
 
       setCharacters(chars);
