@@ -168,13 +168,13 @@ export default function CombatTracker({
   };
 
   const endCombat = () => {
-    const downed = combatants.filter(c => c.hp === 0).map(c => c.name);
+    const downed = _combatants.filter(c => c.hp === 0).map(c => c.name);
     const summary = [
       downed.length ? `Downed: ${downed.join(', ')}` : null,
-      `${round} rounds`,
+      `${_round} rounds`,
     ].filter(Boolean).join(' · ');
     addLog('System', 'Combat ended', summary);
-    setCombatActive(false);
+    _setCombatActive(false);
     notifyStateChange([], false, 0);
   };
 
@@ -195,7 +195,7 @@ export default function CombatTracker({
       characterId: matchedChar?.id || null,
       notes: ''
     };
-    const updated = sortByInitiative([...combatants, c]);
+    const updated = sortByInitiative([..._combatants, c]);
     updateCombatants(updated);
     setNewCombatant({ name: '', initiative: '', hp: '', ac: '', type: 'npc' });
     setShowAddCombatant(false);
