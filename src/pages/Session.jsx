@@ -173,6 +173,53 @@ export default function Session() {
     ? episodes.sort((a, b) => (b.episode_number || 0) - (a.episode_number || 0))[0]?.recap || ''
     : '';
 
+  const handleEndSession = async () => {
+    if (!isDM || !activeSession) return;
+    setClosingSession(true);
+    try {
+      const allEpisodes = await base44.entities.Episode.filter({ campaign_id: campaignId });
+      const nextEpisodeNum = (allEpisodes.length > 0 ? Math.max(...allEpisodes.map(e => e.episode_number || 0)) : 0) + 1;
+      const today = new Date().toISOString().split('T')[0];
+
+      let aiRecap = episodeRecap;
+      if (!aiRecap) {
+        const logs = await base44.entities.SessionLog.filter({ campaign_id: campaignId, session_id: activeSession.id });
+        const logText = logs
+          .filter(l => l.entry_type !== 'AI_DM_MESSAGE')
+          .map(l => `[${l.entry_type}] ${l.user_name || 'Unknown'}: ${l.content}`)
+          .join('\n');
+        if (logText.trim()) {
+          aiRecap = await base44.integrations.Core.InvokeLLM({
+            prompt: `You are a skilled narrator summarizing a D&D 5e session. Based on the following session log, write a concise, engaging episode recap in 2-4 paragraphs, written in past tense as a chronicle entry. Focus on key story beats, character moments, and significant decisions. Campaign: "${campaign?.name}". Session log:\n\n${logText.slice(0, 3000)}`,
+            add_context_from_internet: false
+          });
+        }
+      }
+
+      await base44.entities.Episode.create({
+        campaign_id: campaignId,
+        episode_number: nextEpisodeNum,
+        name: episodeTitle || `Episode ${nextEpisodeNum}`,
+        date: today,
+        status: 'completed',
+        recap: aiRecap || '',
+        participant_ids: [],
+      });
+      await base44.entities.ActiveSession.update(activeSession.id, { status: 'closed' });
+
+      setActiveSession(null);
+      setEndSessionDialog(false);
+      setEpisodeTitle('');
+      setEpisodeRecap('');
+      loadData();
+      navigate(createPageUrl(`CampaignDetail?id=${campaignId}`));
+    } catch (err) {
+      console.error('Error closing session:', err);
+    } finally {
+      setClosingSession(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-8">
