@@ -282,19 +282,32 @@ export default function UnifiedAIPanel({
   async function sendMessage() {
     if (!input.trim() || loading) return;
     const text = input.trim();
-    const userMsg = { id: Date.now(), role: 'user', content: text, user_name: userName || (isDM ? 'DM' : 'Player'), timestamp: new Date().toISOString() };
+    const isOOC = oocMode && isAIDM;
+    const userMsg = {
+      id: Date.now(), role: 'user', content: text,
+      user_name: userName || (isDM ? 'DM' : 'Player'),
+      ooc: isOOC,
+      timestamp: new Date().toISOString()
+    };
     setMessages(prev => [...prev, userMsg]);
     setInput('');
     setLoading(true);
-    await persistMessage(text, true);
+    await persistMessage(isOOC ? `[OOC] ${text}` : text, true);
 
     try {
       const history = [...messages, userMsg].slice(-14).map(m =>
-        m.role === 'user' ? `${m.user_name || 'Player'}: ${m.content}` : `${aiLabel}: ${m.content}`
+        m.role === 'user'
+          ? `${m.user_name || 'Player'}${m.ooc ? ' [OOC]' : ''}: ${m.content}`
+          : `${aiLabel}: ${m.content}`
       ).join('\n\n');
-      const prompt = `${getSystemPrompt()}\n\n--- CONVERSATION ---\n${history}\n\nRespond as ${aiLabel}:`;
+
+      const oocNote = isOOC
+        ? `\n\nNOTE: The player's next message is OUT OF CHARACTER (marked [OOC]). They are speaking directly to you as the DM — not roleplaying. Answer their question or address their concern naturally as a helpful DM, outside the fiction. Don't narrate, don't use second person. Just answer plainly and helpfully.`
+        : '';
+
+      const prompt = `${getSystemPrompt()}${oocNote}\n\n--- CONVERSATION ---\n${history}\n\nRespond as ${aiLabel}:`;
       const response = await base44.integrations.Core.InvokeLLM({ prompt, add_context_from_internet: false });
-      setMessages(prev => [...prev, { id: Date.now() + 1, role: 'assistant', content: response, timestamp: new Date().toISOString() }]);
+      setMessages(prev => [...prev, { id: Date.now() + 1, role: 'assistant', content: response, ooc: isOOC, timestamp: new Date().toISOString() }]);
       await persistMessage(response, false);
     } catch (e) {
       setMessages(prev => [...prev, { id: Date.now() + 1, role: 'assistant', content: 'The mists obscure my vision. Please try again.', timestamp: new Date().toISOString() }]);
