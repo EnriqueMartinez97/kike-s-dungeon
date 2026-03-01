@@ -188,6 +188,13 @@ export default function CampaignDetail() {
     setDeleteEpisodeId(null);
   };
 
+  const handleDeleteSession = async () => {
+    if (!deleteSessionId) return;
+    await base44.entities.ActiveSession.delete(deleteSessionId);
+    setSessionHistory(prev => prev.filter(s => s.id !== deleteSessionId));
+    setDeleteSessionId(null);
+  };
+
   const formatDuration = (start, end) => {
     if (!start || !end) return 'Unknown duration';
     const ms = new Date(end) - new Date(start);
