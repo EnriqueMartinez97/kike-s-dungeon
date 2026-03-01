@@ -342,11 +342,9 @@ export default function Session() {
                 <TabsTrigger value="dice" className="data-[state=active]:bg-violet-600 flex items-center gap-1.5">
                   <Dice6 className="h-4 w-4" /> Dice
                 </TabsTrigger>
-                {!isAIMode && (
-                  <TabsTrigger value="scribe" className="data-[state=active]:bg-violet-600 flex items-center gap-1.5">
-                    <MessageSquare className="h-4 w-4" /> Seren
-                  </TabsTrigger>
-                )}
+                <TabsTrigger value="scribe" className="data-[state=active]:bg-violet-600 flex items-center gap-1.5">
+                  <MessageSquare className="h-4 w-4" /> Seren
+                </TabsTrigger>
               </TabsList>
 
               {isAIMode && (
