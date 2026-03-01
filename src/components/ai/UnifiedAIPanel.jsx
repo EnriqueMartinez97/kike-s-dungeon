@@ -472,18 +472,18 @@ export default function UnifiedAIPanel({
           <div className="flex gap-1">
             {isAIDM && messages.length > 0 && (
               <Button size="sm" variant="ghost" onClick={() => {
+                setMessages([]);
                 setIsRedoOnboarding(true);
                 setOnboardingAnswers({});
                 setAiDecideMode(false);
                 setOnboardingMode(true);
-              }} className="text-violet-400 h-7 px-2 text-xs" title="Redo session setup">
-                <RefreshCw className="h-3 w-3 mr-1" /> Redo Setup
+              }} className="text-violet-400 h-7 px-2 text-xs" title="Clear and restart">
+                <RefreshCw className="h-3 w-3 mr-1" /> Clear
               </Button>
             )}
-            {messages.length > 0 && (
-              <Button size="sm" variant="ghost" onClick={async () => {
+            {!isAIDM && messages.length > 0 && (
+              <Button size="sm" variant="ghost" onClick={() => {
                 setMessages([]);
-                if (isAIDM) { setIsRedoOnboarding(false); setOnboardingDone(false); setOnboardingMode(true); }
               }} className="text-slate-500 h-7 px-2 text-xs">Clear</Button>
             )}
             {isCollapsible && (
