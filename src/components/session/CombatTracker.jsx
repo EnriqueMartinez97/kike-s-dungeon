@@ -360,7 +360,7 @@ export default function CombatTracker({
           <CardContent className="p-2">
             <ScrollArea className="max-h-[150px]">
               <div className="space-y-1">
-                {[...combatLog].reverse().map(entry => (
+                {[..._combatLog].reverse().map(entry => (
                   <div key={entry.id} className="text-xs text-slate-400 border-b border-slate-800 pb-1">
                     <span className="text-slate-500">R{entry.round}</span> · <span className="text-white">{entry.actor}</span> · {entry.action}
                     {entry.details && <span className="text-slate-500"> — {entry.details}</span>}
