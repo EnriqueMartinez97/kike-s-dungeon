@@ -229,10 +229,20 @@ export default function MyLibrary() {
           </h1>
           <p className="text-slate-400 mt-1">{documents.length} document{documents.length !== 1 ? 's' : ''}</p>
         </div>
-        <Button onClick={openNew} className="bg-violet-600 hover:bg-violet-700">
-          <Plus className="h-4 w-4 mr-2" />
-          New Document
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant={bulkMode ? 'default' : 'outline'}
+            onClick={() => { setBulkMode(p => !p); setSelectedDocIds([]); }}
+            className={bulkMode ? 'bg-violet-600 hover:bg-violet-700' : 'border-slate-700 text-slate-300 hover:bg-slate-800'}
+          >
+            <Link className="h-4 w-4 mr-2" />
+            {bulkMode ? 'Cancel Selection' : 'Bulk Link'}
+          </Button>
+          <Button onClick={openNew} className="bg-violet-600 hover:bg-violet-700">
+            <Plus className="h-4 w-4 mr-2" />
+            New Document
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}
