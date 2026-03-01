@@ -450,7 +450,8 @@ export default function UnifiedAIPanel({
         </div>
       </CardHeader>
 
-      <ScrollArea className="flex-1 p-3">
+      <div className="flex-1 relative overflow-hidden">
+      <ScrollArea className="h-full p-3" onScrollCapture={handleScroll}>
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center py-8">
             {isAIDM ? <Crown className="h-10 w-10 text-violet-500/30 mb-3" /> : <ScrollText className="h-10 w-10 text-amber-500/30 mb-3" />}
