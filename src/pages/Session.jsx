@@ -42,6 +42,13 @@ export default function Session() {
   const [combatState, setCombatState] = useState(null);
   const [recentRolls, setRecentRolls] = useState([]);
 
+  // Lifted combat state to survive tab switches
+  const [combatActive, setCombatActive] = useState(false);
+  const [combatRound, setCombatRound] = useState(1);
+  const [combatTurnIndex, setCombatTurnIndex] = useState(0);
+  const [combatants, setCombatants] = useState([]);
+  const [combatLog, setCombatLog] = useState([]);
+
   const [restDialog, setRestDialog] = useState(null);
   const [restingId, setRestingId] = useState(null);
   const [endSessionDialog, setEndSessionDialog] = useState(false);
