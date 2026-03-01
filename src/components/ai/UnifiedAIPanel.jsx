@@ -58,6 +58,8 @@ function buildPrompt({ isAIDM, campaign, ctx, onboardingContext }) {
 
   if (isAIDM) {
     const hasDocuments = ctx.docs && ctx.docs.trim().length > 0;
+    const isLongCampaign = campaign?.long_campaign_mode;
+    
     const worldGrounding = hasDocuments
       ? `WORLD GROUNDING — CRITICAL RULES:
 - The campaign documents below are your BIBLE. Every location, NPC, faction, piece of lore, and history described in them is CANON.
@@ -70,22 +72,36 @@ function buildPrompt({ isAIDM, campaign, ctx, onboardingContext }) {
 - Base everything on the campaign's tone (${campaign?.tone || 'heroic_fantasy'}) and description.
 - Be internally consistent — once you establish a location, NPC, or fact, stick to it throughout.`;
 
+    const styleGuide = isLongCampaign
+      ? `NARRATIVE STYLE — LONG CAMPAIGN (Slow Burn):
+- Prioritize world-building and atmosphere. Let the world breathe.
+- Introduce NPCs and locations gradually. Don't rush into major conflicts.
+- Focus on character moments, dialogue, and exploration — not action.
+- Build tension slowly and naturally. Let mysteries and plot hooks emerge organically from roleplay.
+- Avoid forcing drama or combat. Let the players' choices drive pacing and stakes.
+- Introduce the story's themes and conflicts gently in the first few sessions.
+- Make the world feel lived-in: describe routines, quirks, local color, small details.
+- Allow for downtime and roleplay. These moments deepen investment.`
+      : `NARRATIVE STYLE:
+- Master storyteller. Narrate vividly, voice NPCs distinctly, describe with sensory detail.
+- Narrate key moments automatically; respond appropriately to player actions.
+- Be concise. Keep responses compact and punchy — 2 to 4 short paragraphs max. Never over-explain.
+- Save longer narration only for major dramatic moments (combat starts, big reveals, scene openers).
+- For simple player actions or questions, respond in 1-3 sentences.`;
+
     return `You are the Dungeon Master for a D&D 5e campaign.
 
 ${base}
 Mode: AI Dungeon Master (no human DM present)
-Long Campaign: ${campaign?.long_campaign_mode ? 'YES — deep narrative continuity' : 'No'}
+Long Campaign: ${isLongCampaign ? 'YES — deep narrative continuity, slow burn' : 'No'}
 
 ${worldGrounding}
 
-YOUR ROLE:
-- Master storyteller. Narrate vividly, voice NPCs distinctly, describe with sensory detail.
-- Narrate key moments automatically; respond appropriately to player actions.
+${styleGuide}
+
+CORE RESPONSIBILITIES:
 - Know and apply D&D 5e rules correctly.
 - Use second person ("You see...", "Before you...") for narration.
-- Be concise. Keep responses compact and punchy — 2 to 4 short paragraphs max. Never over-explain.
-- Save longer narration only for major dramatic moments (combat starts, big reveals, scene openers).
-- For simple player actions or questions, respond in 1-3 sentences.
 
 ${onboardingContext ? `SESSION SETUP:\n${onboardingContext}\n` : ''}
 ${ctx.historyBlock ? `${ctx.historyBlock}\n` : ''}
