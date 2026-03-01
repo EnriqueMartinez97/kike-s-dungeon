@@ -183,11 +183,11 @@ export default function UnifiedAIPanel({
   }
 
   async function persistMessage(content, isUser) {
-    if (!isAIDM || !sessionId) return;
+    if (!sessionId) return;
     await base44.entities.SessionLog.create({
       campaign_id: campaignId, session_id: sessionId,
-      entry_type: 'AI_DM_MESSAGE',
-      user_id: isUser ? userId : 'ai-dm',
+      entry_type: entryType,
+      user_id: isUser ? userId : (isAIDM ? 'ai-dm' : 'seren'),
       user_name: isUser ? (userName || 'Player') : aiLabel,
       content,
       metadata: { is_user_message: isUser, ai_generated: !isUser },
