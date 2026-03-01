@@ -35,7 +35,7 @@ export default function SessionHome({ campaignId, isDM, onStartSession, onCloseS
 
   const loadSessionData = async () => {
     const [sessionData, campData, membershipsData] = await Promise.all([
-      base44.entities.ActiveSession.filter({ campaign_id: campaignId }),
+      base44.entities.ActiveSession.filter({ campaign_id: campaignId, status: 'active' }),
       base44.entities.Campaign.filter({ id: campaignId }),
       base44.entities.CampaignMembership.filter({ campaign_id: campaignId })
     ]);
