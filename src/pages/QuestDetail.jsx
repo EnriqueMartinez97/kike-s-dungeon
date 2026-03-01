@@ -117,6 +117,11 @@ export default function QuestDetail() {
     }));
   };
 
+  const handleDelete = async () => {
+    await base44.entities.Quest.delete(quest.id);
+    navigate(createPageUrl(`CampaignDetail?id=${quest.campaign_id}`));
+  };
+
   const statusColors = {
     active: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
     completed: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
