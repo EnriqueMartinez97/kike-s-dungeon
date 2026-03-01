@@ -468,7 +468,7 @@ export default function CombatTracker({
               </div>
               <DialogFooter>
                 <Button size="sm" variant="ghost"
-                  onClick={() => { updateCombatants(combatants.filter(x => x.id !== target.id)); closeAction(); }}
+                  onClick={() => { updateCombatants(_combatants.filter(x => x.id !== target.id)); closeAction(); }}
                   className="text-red-400 mr-auto">
                   <Trash2 className="h-4 w-4 mr-1" /> Remove
                 </Button>
