@@ -167,13 +167,13 @@ export default function UnifiedAIPanel({
 
   async function loadPersistedMessages() {
     try {
-      const logs = await base44.entities.SessionLog.filter({ campaign_id: campaignId, session_id: sessionId, entry_type: 'AI_DM_MESSAGE' });
+      const logs = await base44.entities.SessionLog.filter({ campaign_id: campaignId, session_id: sessionId, entry_type: entryType });
       logs.sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
       setMessages(logs.map(l => ({
         id: l.id, role: l.metadata?.is_user_message ? 'user' : 'assistant',
         content: l.content, timestamp: l.created_date, user_name: l.user_name,
       })));
-      if (logs.length > 0) setOnboardingDone(true);
+      if (logs.length > 0 && isAIDM) setOnboardingDone(true);
     } catch (e) { console.error('Failed to load AI messages', e); }
   }
 
