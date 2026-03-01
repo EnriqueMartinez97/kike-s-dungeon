@@ -416,7 +416,7 @@ export default function CombatTracker({
       </Dialog>
 
       {showActionDialog && (() => {
-        const target = combatants.find(c => c.id === showActionDialog);
+        const target = _combatants.find(c => c.id === showActionDialog);
         if (!target) return null;
         return (
           <Dialog open={!!showActionDialog} onOpenChange={closeAction}>
