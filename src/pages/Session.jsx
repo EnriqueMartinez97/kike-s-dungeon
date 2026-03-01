@@ -434,9 +434,9 @@ export default function Session() {
                               ? <p className="text-slate-400 text-center text-sm py-4">No episodes yet</p>
                               : <div className="space-y-2">
                                 {[...episodes].reverse().slice(0, 5).map(ep => (
-                                  <div key={ep.id} className="p-3 rounded-lg bg-slate-800/50 border border-slate-700 flex items-center justify-between">
+                                  <div key={ep.id} className="p-3 rounded-lg bg-slate-800/50 border border-slate-700 hover:border-slate-600 cursor-pointer transition-colors flex items-center justify-between group" onClick={() => setSelectedEpisodeLogs(ep)}>
                                     <div>
-                                      <p className="font-semibold text-white text-sm">#{ep.episode_number} {ep.name}</p>
+                                      <p className="font-semibold text-white text-sm group-hover:text-violet-300 transition-colors">#{ep.episode_number} {ep.name}</p>
                                       <p className="text-xs text-slate-500">{ep.date || 'TBD'}</p>
                                     </div>
                                     <Badge className={ep.status === 'completed' ? 'bg-slate-500/20 text-slate-300' : 'bg-amber-500/20 text-amber-300'}>
