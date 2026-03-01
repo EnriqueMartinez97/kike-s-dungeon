@@ -2,12 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
-import { 
-  Sword, 
-  Sparkles, 
-  ArrowRight,
-  Plus
-} from 'lucide-react';
+import { Sparkles, ArrowRight, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { motion } from 'framer-motion';
@@ -15,7 +10,6 @@ import { motion } from 'framer-motion';
 export default function Home() {
   const [user, setUser] = useState(null);
   const [campaigns, setCampaigns] = useState([]);
-  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,7 +22,6 @@ export default function Home() {
       if (isAuth) {
         const currentUser = await base44.auth.me();
         setUser(currentUser);
-        
         const memberships = await base44.entities.CampaignMembership.filter({ user_id: currentUser.id });
         if (memberships.length > 0) {
           const campaignIds = memberships.map(m => m.campaign_id);
@@ -38,8 +31,6 @@ export default function Home() {
       }
     } catch (e) {
       // Not logged in
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -48,7 +39,6 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative overflow-hidden py-20 lg:py-32">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-violet-900/20 via-transparent to-transparent" />
-        
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -60,23 +50,23 @@ export default function Home() {
               <Sparkles className="h-4 w-4" />
               <span>Now with AI Dungeon Master</span>
             </div>
-            
+
             <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white mb-6 tracking-tight">
               Welcome to
               <span className="block bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
-                Kike's Dung<span>e</span>on
+                Kike's Dungeon
               </span>
             </h1>
-            
+
             <p className="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto mb-10">
-              The ultimate DnD 5e campaign manager. Run epic adventures with your party, 
+              The ultimate DnD 5e campaign manager. Run epic adventures with your party,
               manage characters, and let AI take over when your DM needs a break.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               {user ? (
                 <>
-                  <Button 
+                  <Button
                     size="lg"
                     onClick={() => navigate(createPageUrl('CreateCampaign'))}
                     className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white px-8 py-6 text-lg shadow-xl shadow-violet-500/25"
@@ -84,7 +74,7 @@ export default function Home() {
                     <Plus className="h-5 w-5 mr-2" />
                     Create Campaign
                   </Button>
-                  <Button 
+                  <Button
                     size="lg"
                     variant="outline"
                     onClick={() => navigate(createPageUrl('Campaigns'))}
@@ -96,7 +86,7 @@ export default function Home() {
                 </>
               ) : (
                 <>
-                  <Button 
+                  <Button
                     size="lg"
                     onClick={() => base44.auth.redirectToLogin()}
                     className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white px-8 py-6 text-lg shadow-xl shadow-violet-500/25"
@@ -104,7 +94,7 @@ export default function Home() {
                     Get Started
                     <ArrowRight className="h-5 w-5 ml-2" />
                   </Button>
-                  <Button 
+                  <Button
                     size="lg"
                     variant="outline"
                     onClick={() => base44.auth.redirectToLogin()}
@@ -125,14 +115,13 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-2xl font-bold text-white">Your Recent Campaigns</h2>
-              <Link 
+              <Link
                 to={createPageUrl('Campaigns')}
                 className="text-violet-400 hover:text-violet-300 text-sm font-medium flex items-center gap-1"
               >
                 View all <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
-            
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {campaigns.map((campaign) => (
                 <Link key={campaign.id} to={createPageUrl(`CampaignDetail?id=${campaign.id}`)}>
@@ -143,8 +132,8 @@ export default function Home() {
                       )}
                       <div className="absolute bottom-3 left-3">
                         <span className={`text-xs px-2 py-1 rounded-full ${
-                          campaign.mode === 'dm_present' 
-                            ? 'bg-emerald-500/20 text-emerald-300' 
+                          campaign.mode === 'dm_present'
+                            ? 'bg-emerald-500/20 text-emerald-300'
                             : 'bg-amber-500/20 text-amber-300'
                         }`}>
                           {campaign.mode === 'dm_present' ? 'DM Present' : 'AI DM'}
