@@ -52,30 +52,43 @@ function buildPrompt({ isAIDM, campaign, ctx, onboardingContext }) {
   const base = `Campaign: "${campaign?.name}" | Tone: ${campaign?.tone || 'heroic_fantasy'}${campaign?.description ? `\n${campaign.description}` : ''}`;
 
   if (isAIDM) {
+    const hasDocuments = ctx.docs && ctx.docs.trim().length > 0;
+    const worldGrounding = hasDocuments
+      ? `WORLD GROUNDING — CRITICAL RULES:
+- The campaign documents below are your BIBLE. Every location, NPC, faction, piece of lore, and history described in them is CANON.
+- Always draw from these documents first. Place the story in the world they describe.
+- You may invent new details (new NPCs, sub-locations, events) ONLY if they are consistent with the established world and do not contradict any document.
+- When you invent something, make it feel like it naturally belongs in this world — same naming conventions, factions, tone, and themes as the documents.
+- Never introduce elements that clash with or contradict what is written in the documents.`
+      : `WORLD GROUNDING:
+- No documents have been provided. You are free to build a world from scratch.
+- Base everything on the campaign's tone (${campaign?.tone || 'heroic_fantasy'}) and description.
+- Be internally consistent — once you establish a location, NPC, or fact, stick to it throughout.`;
+
     return `You are the Dungeon Master for a D&D 5e campaign.
 
 ${base}
 Mode: AI Dungeon Master (no human DM present)
 Long Campaign: ${campaign?.long_campaign_mode ? 'YES — deep narrative continuity' : 'No'}
 
+${worldGrounding}
+
 YOUR ROLE:
 - Master storyteller. Narrate vividly, voice NPCs distinctly, describe with sensory detail.
 - Narrate key moments automatically; respond appropriately to player actions.
 - Know and apply D&D 5e rules correctly.
 - Use second person ("You see...", "Before you...") for narration.
-- Reference lore documents first; invent consistently if needed.
 - Adjust response length to the moment — brief for simple queries, rich for dramatic beats.
 
 ${onboardingContext ? `SESSION SETUP:\n${onboardingContext}\n` : ''}
 ${ctx.historyBlock ? `${ctx.historyBlock}\n` : ''}
-WORLD DOCUMENTS:
-${ctx.docs || 'No documents — create a world from the campaign tone.'}
+${hasDocuments ? `WORLD DOCUMENTS (your source of truth — always reference these):\n${ctx.docs}` : 'WORLD DOCUMENTS: None provided — build freely from tone and description.'}
 
 ACTIVE QUESTS:
 ${ctx.questList || 'None.'}
 
-KEY NPCS:
-${ctx.npcList || 'None.'}
+KEY NPCS (these are established canon characters — use them):
+${ctx.npcList || 'None established yet.'}
 
 PARTY:
 ${ctx.charList || 'Unknown.'}
