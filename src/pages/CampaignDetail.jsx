@@ -56,6 +56,7 @@ export default function CampaignDetail() {
   const [leaveCampaignOpen, setLeaveCampaignOpen] = useState(false);
   const [deleteEpisodeId, setDeleteEpisodeId] = useState(null);
   const [deleteSessionId, setDeleteSessionId] = useState(null);
+  const [deleteSessionDeleteEpisode, setDeleteSessionDeleteEpisode] = useState(false);
   const [sessionHistory, setSessionHistory] = useState([]);
   const navigate = useNavigate();
 
