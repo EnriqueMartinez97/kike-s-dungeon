@@ -3,8 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import {
-  ArrowLeft, Calendar, Users, Edit, Save, X, BookOpen, Clock, Hash
+  ArrowLeft, Calendar, Users, Edit, Save, X, BookOpen, Clock, Hash, Trash2
 } from 'lucide-react';
+import {
+  AlertDialog, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';

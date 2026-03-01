@@ -83,7 +83,7 @@ export default function SessionHome({ campaignId, isDM, onStartSession, onCloseS
       };
 
       const createdEpisode = await base44.entities.Episode.create(episodeData);
-      await base44.entities.ActiveSession.update(activeSession.id, { status: 'closed' });
+      await base44.entities.ActiveSession.update(activeSession.id, { status: 'closed', session_end: new Date().toISOString() });
 
       setActiveSession(null);
       setShowCloseDialog(false);

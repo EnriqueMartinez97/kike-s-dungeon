@@ -198,7 +198,7 @@ export default function Session() {
         recap: episodeRecap || '',
         participant_ids: [],
       });
-      await base44.entities.ActiveSession.update(sessionIdToClose, { status: 'closed' });
+      await base44.entities.ActiveSession.update(sessionIdToClose, { status: 'closed', session_end: new Date().toISOString() });
 
       setActiveSession(null);
       setEndSessionDialog(false);
