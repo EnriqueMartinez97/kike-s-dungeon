@@ -714,9 +714,19 @@ export default function CampaignDetail() {
                             </p>
                           </div>
                         </div>
-                        <Badge className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                          {duration}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <Badge className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            {duration}
+                          </Badge>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-7 w-7 text-slate-500 hover:text-red-400 hover:bg-red-500/10"
+                            onClick={() => setDeleteSessionId(session.id)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
                       </CardContent>
                     </Card>
                   );
