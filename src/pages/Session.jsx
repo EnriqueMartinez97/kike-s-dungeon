@@ -181,9 +181,12 @@ export default function Session() {
     finally { setRestingId(null); setRestDialog(null); }
   };
 
-  const sessionSummary = episodes.length > 0
-    ? episodes.sort((a, b) => (b.episode_number || 0) - (a.episode_number || 0))[0]?.recap || ''
-    : '';
+  const sessionSummary = (() => {
+    const sorted = [...episodes].sort((a, b) => (b.episode_number || 0) - (a.episode_number || 0));
+    if (sorted.length === 0) return '';
+    const lastRecap = sorted[0]?.recap || '';
+    return lastRecap ? `**Last Session:** ${lastRecap}` : '';
+  })();
 
   const handleEndSession = async () => {
     if (!isDM || !activeSession) return;
