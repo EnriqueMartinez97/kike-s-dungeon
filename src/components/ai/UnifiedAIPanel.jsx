@@ -464,16 +464,26 @@ export default function UnifiedAIPanel({
             {messages.map(msg => (
               <div key={msg.id} className={`flex gap-2 group ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 {msg.role === 'assistant' && (
-                  <Avatar className="h-6 w-6 flex-shrink-0 mt-0.5">
-                    <AvatarFallback className={`${aiAvatarBg} text-white text-xs`}>{aiInitial}</AvatarFallback>
-                  </Avatar>
+                 <Avatar className="h-6 w-6 flex-shrink-0 mt-0.5">
+                   <AvatarFallback className={`${msg.ooc ? 'bg-slate-600' : aiAvatarBg} text-white text-xs`}>{aiInitial}</AvatarFallback>
+                 </Avatar>
                 )}
                 <div className={`relative max-w-[85%] rounded-xl px-3 py-2 text-xs ${
-                  msg.role === 'user' ? 'bg-violet-600 text-white'
-                  : isAIDM ? 'bg-slate-800 text-slate-100 border border-violet-500/10'
-                  : 'bg-slate-800 text-amber-50 border border-amber-500/10'
+                 msg.role === 'user' && msg.ooc ? 'bg-slate-700 text-slate-200 border border-slate-500/50'
+                 : msg.role === 'user' ? 'bg-violet-600 text-white'
+                 : msg.ooc ? 'bg-slate-800/80 text-slate-300 border border-slate-500/30 italic'
+                 : isAIDM ? 'bg-slate-800 text-slate-100 border border-violet-500/10'
+                 : 'bg-slate-800 text-amber-50 border border-amber-500/10'
                 }`}>
-                  {msg.role === 'user' && msg.user_name && <p className="text-xs text-violet-200 font-medium mb-1">{msg.user_name}</p>}
+                 {msg.role === 'user' && msg.user_name && (
+                   <p className="text-xs font-medium mb-1 flex items-center gap-1">
+                     <span className={msg.ooc ? 'text-slate-400' : 'text-violet-200'}>{msg.user_name}</span>
+                     {msg.ooc && <span className="text-slate-500 text-[10px] font-normal">[out of character]</span>}
+                   </p>
+                 )}
+                 {msg.role === 'assistant' && msg.ooc && (
+                   <p className="text-[10px] text-slate-500 mb-1">[out of character]</p>
+                 )}
                   {editingId === msg.id ? (
                     <div className="space-y-2">
                       <Textarea value={editContent} onChange={e => setEditContent(e.target.value)}
