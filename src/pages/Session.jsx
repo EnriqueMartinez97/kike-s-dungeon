@@ -574,6 +574,32 @@ export default function Session() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {selectedEpisodeLogs && (
+        <AlertDialog open={!!selectedEpisodeLogs} onOpenChange={() => setSelectedEpisodeLogs(null)}>
+          <AlertDialogContent className="bg-slate-900 border-slate-700 max-w-2xl max-h-[80vh] overflow-auto">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-white">Episode #{selectedEpisodeLogs.episode_number} - Session Log</AlertDialogTitle>
+              <AlertDialogDescription className="text-slate-400">{selectedEpisodeLogs.name}</AlertDialogDescription>
+            </AlertDialogHeader>
+            <div className="space-y-3 my-4 max-h-[60vh] overflow-y-auto">
+              {selectedEpisodeLogs.session_log && selectedEpisodeLogs.session_log.length > 0 ? (
+                selectedEpisodeLogs.session_log.map((log, idx) => (
+                  <div key={idx} className="p-2 rounded bg-slate-800/50 border border-slate-700 text-xs">
+                    <p className="text-slate-400">[{log.type}]</p>
+                    <p className="text-slate-200 mt-1">{log.content}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-slate-400 text-sm">No session logs available for this episode.</p>
+              )}
+            </div>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="border-slate-700 text-slate-300">Close</AlertDialogCancel>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </div>
   );
 }
