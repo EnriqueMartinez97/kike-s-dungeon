@@ -19,7 +19,9 @@ import {
   Play,
   Calendar,
   Trash2,
-  Unlink
+  Unlink,
+  Clock,
+  History
 } from 'lucide-react';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter
