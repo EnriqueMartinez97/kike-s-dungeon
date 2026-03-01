@@ -371,7 +371,7 @@ export default function UnifiedAIPanel({
           <div className="flex flex-col items-center justify-center h-full text-center py-8">
             {isAIDM ? <Crown className="h-10 w-10 text-violet-500/30 mb-3" /> : <ScrollText className="h-10 w-10 text-amber-500/30 mb-3" />}
             <p className="text-slate-500 text-sm">
-              {isAIDM ? 'The Dungeon Master awaits. Describe your action or ask anything.' : 'Ask Seren about lore, rules, or documents.'}
+              {isAIDM ? 'The Dungeon Master awaits. Describe your action or ask anything.' : 'Greetings. I am Seren, keeper of lore and scribe of the realm. Ask me about lore, rules, or documents.'}
             </p>
           </div>
         ) : (
