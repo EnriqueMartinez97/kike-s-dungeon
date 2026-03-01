@@ -281,7 +281,7 @@ export default function CombatTracker({
                         <Input
                           type="number"
                           value={c.initiative}
-                          onChange={e => updateCombatants(combatants.map(x => x.id === c.id ? { ...x, initiative: parseInt(e.target.value) || 0 } : x))}
+                          onChange={e => updateCombatants(_combatants.map(x => x.id === c.id ? { ...x, initiative: parseInt(e.target.value) || 0 } : x))}
                           className="w-10 h-6 text-xs bg-slate-700 border-slate-600 text-center text-white p-0"
                         />
                       ) : (
