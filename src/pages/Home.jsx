@@ -165,10 +165,57 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Recent Campaigns (if logged in) */}
+      {user && campaigns.length > 0 && (
+        <section className="py-16 border-t border-slate-800/50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl font-bold text-white">Your Recent Campaigns</h2>
+              <Link 
+                to={createPageUrl('Campaigns')}
+                className="text-violet-400 hover:text-violet-300 text-sm font-medium flex items-center gap-1"
+              >
+                View all <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+            
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {campaigns.map((campaign) => (
+                <Link key={campaign.id} to={createPageUrl(`CampaignDetail?id=${campaign.id}`)}>
+                  <Card className="bg-slate-900/50 border-slate-800 hover:border-violet-500/50 transition-all group overflow-hidden">
+                    <div className="h-32 bg-gradient-to-br from-violet-600/20 to-purple-600/20 relative">
+                      {campaign.cover_image && (
+                        <img src={campaign.cover_image} alt="" className="absolute inset-0 w-full h-full object-cover opacity-50" />
+                      )}
+                      <div className="absolute bottom-3 left-3">
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          campaign.mode === 'dm_present' 
+                            ? 'bg-emerald-500/20 text-emerald-300' 
+                            : 'bg-amber-500/20 text-amber-300'
+                        }`}>
+                          {campaign.mode === 'dm_present' ? 'DM Present' : 'AI DM'}
+                        </span>
+                      </div>
+                    </div>
+                    <CardContent className="p-4">
+                      <h3 className="font-semibold text-white group-hover:text-violet-300 transition-colors">
+                        {campaign.name}
+                      </h3>
+                      <p className="text-sm text-slate-400 mt-1 line-clamp-2">
+                        {campaign.description || 'No description'}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
     </div>
   );
 }
-// DELETED BELOW
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-2xl font-bold text-white">Your Recent Campaigns</h2>
