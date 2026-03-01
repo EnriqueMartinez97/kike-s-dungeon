@@ -16,6 +16,11 @@ const ONBOARDING_QUESTIONS = [
   { key: 'goals', label: "Party's immediate goals this session?", placeholder: 'e.g. Find the missing merchant...' },
 ];
 
+const REDO_QUESTIONS = [
+  { key: 'mood', label: 'What tone/mood for this session?', placeholder: 'e.g. Tense, mysterious, action-packed...' },
+  { key: 'goals', label: "Party's immediate goals this session?", placeholder: 'e.g. Find the missing merchant...' },
+];
+
 function buildContext({ campaign, documents, npcs, quests, characters, combatState, recentRolls, sessionSummary }) {
   const docs = documents.map(d =>
     `--- DOCUMENT: "${d.title}"${d.category ? ` [${d.category}]` : ''} ---\n${d.content || '(no text)'}`
