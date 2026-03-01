@@ -128,10 +128,19 @@ export default function UnifiedAIPanel({
   const [collapsed, setCollapsed] = useState(false);
   const [onboardingMode, setOnboardingMode] = useState(false);
   const [onboardingAnswers, setOnboardingAnswers] = useState({});
-  const [onboardingDone, setOnboardingDone] = useState(false);
+  const [aiDecideMode, setAiDecideMode] = useState(false);
+  const [aiDecideInput, setAiDecideInput] = useState('');
   const [editingId, setEditingId] = useState(null);
   const [editContent, setEditContent] = useState('');
   const bottomRef = useRef(null);
+
+  // Persist onboarding completion across tab switches using sessionStorage
+  const onboardingKey = `ai_dm_onboarded_${campaignId}_${sessionId}`;
+  const onboardingDone = !!sessionStorage.getItem(onboardingKey);
+  const setOnboardingDone = (val) => {
+    if (val) sessionStorage.setItem(onboardingKey, '1');
+    else sessionStorage.removeItem(onboardingKey);
+  };
 
   const isAIDM = mode === 'dm';
   const aiLabel = isAIDM ? 'Dungeon Master' : 'Seren, the Scribe';
