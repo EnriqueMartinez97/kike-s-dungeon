@@ -185,6 +185,31 @@ export default function MyLibrary() {
     setAttachCampaignIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   };
 
+  const toggleSelectDoc = (id) => {
+    setSelectedDocIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  };
+
+  const toggleSelectAll = () => {
+    setSelectedDocIds(prev => prev.length === filtered.length ? [] : filtered.map(d => d.id));
+  };
+
+  const saveBulkLink = async () => {
+    setBulkSaving(true);
+    await Promise.all(selectedDocIds.map(docId => {
+      const doc = documents.find(d => d.id === docId);
+      const existing = getDocCampaignIds(doc);
+      const merged = [...new Set([...existing, ...bulkCampaignIds])];
+      return base44.entities.Document.update(docId, { campaign_ids: merged, campaign_id: merged[0] || null });
+    }));
+    const updated = await base44.entities.Document.filter({ owner_id: user.id });
+    setDocuments(updated);
+    setBulkLinkOpen(false);
+    setBulkCampaignIds([]);
+    setSelectedDocIds([]);
+    setBulkMode(false);
+    setBulkSaving(false);
+  };
+
   if (loading) return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-4">
       <Skeleton className="h-8 w-48" />
