@@ -354,7 +354,13 @@ export default function Session() {
                     </div>
                     <div className="space-y-4 overflow-y-auto">
                       {isDM && (
-                        <CombatTracker characters={characters} npcs={npcs} isDM={isDM} campaignId={campaignId} onCombatStateChange={handleCombatStateChange} />
+                        <CombatTracker characters={characters} npcs={npcs} isDM={isDM} campaignId={campaignId} onCombatStateChange={handleCombatStateChange}
+                          combatActive={combatActive} setCombatActive={setCombatActive}
+                          round={combatRound} setRound={setCombatRound}
+                          currentTurnIndex={combatTurnIndex} setCurrentTurnIndex={setCombatTurnIndex}
+                          combatants={combatants} setCombatants={setCombatants}
+                          combatLog={combatLog} setCombatLog={setCombatLog}
+                        />
                       )}
                       <QuickQuestPanel campaignId={campaignId} isDM={isDM} userId={user?.id} />
                     </div>
