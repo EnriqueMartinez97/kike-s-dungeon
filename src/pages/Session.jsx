@@ -395,7 +395,7 @@ export default function Session() {
                         <TabsTrigger value="episodes" className="data-[state=active]:bg-violet-600"><BookOpen className="h-4 w-4 mr-1.5" />Episodes</TabsTrigger>
                       </TabsList>
                       <TabsContent value="quests">
-                        <QuickQuestPanel campaignId={campaignId} isDM={isDM} userId={user?.id} userName={user?.full_name} />
+                        <QuickQuestPanel campaignId={campaignId} quests={quests} setQuests={setQuests} isDM={isDM} userId={user?.id} userName={user?.full_name} />
                       </TabsContent>
                       <TabsContent value="characters">
                         <CharactersPanel campaignId={campaignId} isDM={isDM} characters={characters} />
