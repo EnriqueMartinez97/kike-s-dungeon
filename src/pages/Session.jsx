@@ -349,8 +349,8 @@ export default function Session() {
 
               {isAIMode && (
                 <TabsContent value="ai-dm" className="mt-4">
-                  <div className="grid gap-4 lg:grid-cols-3" style={{ height: '600px' }}>
-                    <div className="lg:col-span-2 h-full">
+                  <div className="grid gap-4 lg:grid-cols-3 h-[calc(100vh-200px)]">
+                    <div className="lg:col-span-2 h-full overflow-hidden">
                       <UnifiedAIPanel {...aiProps} sessionId={activeSession.id} mode="dm" />
                     </div>
                     <div className="space-y-4 overflow-y-auto">
