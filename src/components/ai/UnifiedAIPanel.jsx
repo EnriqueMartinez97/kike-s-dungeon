@@ -347,7 +347,7 @@ export default function UnifiedAIPanel({
         ) : (
           <>
             <div className="flex-1 overflow-auto p-4 space-y-4">
-              {ONBOARDING_QUESTIONS.map(q => (
+              {activeQuestions.map(q => (
                 <div key={q.key}>
                   <label className="text-sm text-slate-300 block mb-1 font-medium">{q.label}</label>
                   <Textarea
@@ -360,20 +360,26 @@ export default function UnifiedAIPanel({
               ))}
             </div>
             <div className="border-t border-slate-800 p-4 flex-shrink-0 flex gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setAiDecideMode(true)}
-                className="flex-1 border-violet-500/40 text-violet-300 hover:bg-violet-500/10"
-              >
-                <Sparkles className="h-4 w-4 mr-2" /> Let AI Decide
-              </Button>
+              {!isRedoOnboarding && (
+                <Button
+                  variant="outline"
+                  onClick={() => setAiDecideMode(true)}
+                  className="flex-1 border-violet-500/40 text-violet-300 hover:bg-violet-500/10"
+                >
+                  <Sparkles className="h-4 w-4 mr-2" /> Let AI Decide
+                </Button>
+              )}
+              {isRedoOnboarding && (
+                <Button variant="outline" onClick={() => { setOnboardingMode(false); setIsRedoOnboarding(false); }}
+                  className="flex-1 border-slate-600 text-slate-300">Cancel</Button>
+              )}
               <Button
                 onClick={completeOnboarding}
-                disabled={loading || !ONBOARDING_QUESTIONS.every(q => onboardingAnswers[q.key]?.trim())}
+                disabled={loading || !activeQuestions.every(q => onboardingAnswers[q.key]?.trim())}
                 className="flex-1 bg-violet-600 hover:bg-violet-700"
               >
                 {loading ? <Loader className="h-4 w-4 animate-spin mr-2" /> : <Crown className="h-4 w-4 mr-2" />}
-                Begin Session
+                {isRedoOnboarding ? 'Restart Narration' : 'Begin Session'}
               </Button>
             </div>
           </>
