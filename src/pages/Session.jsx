@@ -44,7 +44,7 @@ export default function Session() {
 
   const [restDialog, setRestDialog] = useState(null);
   const [restingId, setRestingId] = useState(null);
-  const [showEndSessionDialog, setShowEndSessionDialog] = useState(false);
+  const [triggerEndSession, setTriggerEndSession] = useState(null);
 
   const navigate = useNavigate();
   const urlParams = new URLSearchParams(window.location.search);
