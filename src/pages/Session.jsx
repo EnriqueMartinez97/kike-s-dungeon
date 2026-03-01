@@ -256,7 +256,7 @@ export default function Session() {
                 Active since {new Date(activeSession.session_start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </p>
               {isDM && (
-                <Button onClick={() => navigate(createPageUrl(`CampaignDetail?id=${campaignId}`))}
+                <Button onClick={() => { if (triggerEndSession) triggerEndSession(); }}
                   variant="outline" size="sm" className="border-red-500/30 text-red-400 hover:bg-red-500/10">
                   <X className="h-3 w-3 mr-1" /> End Session
                 </Button>
