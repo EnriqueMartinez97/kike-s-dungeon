@@ -281,6 +281,31 @@ export default function MyLibrary() {
         </Select>
       </div>
 
+      {/* Bulk action bar */}
+      {bulkMode && (
+        <div className="flex items-center justify-between p-3 rounded-lg bg-violet-900/30 border border-violet-500/30 mb-4">
+          <div className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              checked={selectedDocIds.length === filtered.length && filtered.length > 0}
+              onChange={toggleSelectAll}
+              className="accent-violet-500 w-4 h-4"
+            />
+            <span className="text-sm text-violet-300">
+              {selectedDocIds.length > 0 ? `${selectedDocIds.length} selected` : 'Select documents'}
+            </span>
+          </div>
+          <Button
+            onClick={() => { setBulkLinkOpen(true); setBulkCampaignIds([]); }}
+            disabled={selectedDocIds.length === 0}
+            className="bg-violet-600 hover:bg-violet-700 h-8 text-sm"
+          >
+            <Link className="h-3.5 w-3.5 mr-2" />
+            Link to Campaigns
+          </Button>
+        </div>
+      )}
+
       {/* Documents Grid */}
       {filtered.length === 0 ? (
         <Card className="bg-slate-900/50 border-slate-800">
