@@ -178,6 +178,21 @@ export default function CampaignDetail() {
     navigate(createPageUrl('Campaigns'));
   };
 
+  const handleDeleteEpisode = async () => {
+    if (!deleteEpisodeId) return;
+    await base44.entities.Episode.delete(deleteEpisodeId);
+    setEpisodes(prev => prev.filter(e => e.id !== deleteEpisodeId));
+    setDeleteEpisodeId(null);
+  };
+
+  const formatDuration = (start, end) => {
+    if (!start || !end) return 'Unknown duration';
+    const ms = new Date(end) - new Date(start);
+    const hrs = Math.floor(ms / 3600000);
+    const mins = Math.floor((ms % 3600000) / 60000);
+    return hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
+  };
+
   const copyInviteCode = () => {
     navigator.clipboard.writeText(campaign.invite_code);
     setCopied(true);
