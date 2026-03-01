@@ -354,7 +354,7 @@ export default function CombatTracker({
         </CardContent>
       </Card>
 
-      {combatLog.length > 0 && (
+      {_combatLog.length > 0 && (
         <Card className="bg-slate-900/50 border-slate-800">
           <CardHeader className="pb-2"><CardTitle className="text-white text-xs">Combat Log</CardTitle></CardHeader>
           <CardContent className="p-2">
