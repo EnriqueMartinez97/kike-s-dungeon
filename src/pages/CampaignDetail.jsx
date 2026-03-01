@@ -831,6 +831,20 @@ export default function CampaignDetail() {
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Delete Episode Confirmation */}
+      <AlertDialog open={!!deleteEpisodeId} onOpenChange={() => setDeleteEpisodeId(null)}>
+        <AlertDialogContent className="bg-slate-900 border-slate-700">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-white">Delete Episode?</AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-400">This will permanently delete this episode. This cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-slate-700 text-slate-300">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteEpisode} className="bg-red-600 hover:bg-red-700">Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Leave Campaign Confirmation */}
       <AlertDialog open={leaveCampaignOpen} onOpenChange={setLeaveCampaignOpen}>
         <AlertDialogContent className="bg-slate-900 border-slate-700">
