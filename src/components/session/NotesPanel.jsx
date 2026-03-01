@@ -50,7 +50,7 @@ export default function NotesPanel({ campaignId, episodeId, user = {}, isDM, mem
   }, [campaignId, user?.id, isDM]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, [notes]);
 
   const sendNote = async () => {

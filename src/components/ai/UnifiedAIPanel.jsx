@@ -154,7 +154,7 @@ export default function UnifiedAIPanel({
     }
   }, [campaignId, sessionId, isAIDM]);
 
-  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, [messages]);
 
   useEffect(() => {
     if (isAIDM && campaign?.long_campaign_mode && messages.length === 0 && !onboardingDone) {

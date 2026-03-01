@@ -62,7 +62,7 @@ export default function SessionLog({ campaignId, sessionId, isDM, userId, userNa
   }, [campaignId, isDM, userId]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, [logs]);
 
   const loadLogs = async () => {
