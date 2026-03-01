@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Send, Loader, ScrollText, ChevronDown, ChevronUp, Trash2, Edit, Check, X, Crown, Sparkles, RefreshCw } from 'lucide-react';
+import { Send, Loader, ScrollText, ChevronDown, ChevronUp, Trash2, Edit, Check, X, Crown, Sparkles, RefreshCw, ArrowDown, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
