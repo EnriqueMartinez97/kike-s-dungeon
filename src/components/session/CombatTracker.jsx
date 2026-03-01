@@ -259,7 +259,7 @@ export default function CombatTracker({
               <Button size="sm" variant="ghost" onClick={() => setShowAddCombatant(true)} className="text-slate-400 h-7 px-2">
                 <Plus className="h-3 w-3" />
               </Button>
-              <Button size="sm" variant="ghost" onClick={() => updateCombatants(sortByInitiative(combatants))} className="text-slate-400 h-7 px-2" title="Re-sort">
+              <Button size="sm" variant="ghost" onClick={() => updateCombatants(sortByInitiative(_combatants))} className="text-slate-400 h-7 px-2" title="Re-sort">
                 <RotateCcw className="h-3 w-3" />
               </Button>
             </div>
