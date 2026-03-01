@@ -155,7 +155,10 @@ export default function UnifiedAIPanel({
   const [aiDecideInput, setAiDecideInput] = useState('');
   const [editingId, setEditingId] = useState(null);
   const [editContent, setEditContent] = useState('');
+  const [oocMode, setOocMode] = useState(false); // Out-of-character toggle
+  const [showScrollBtn, setShowScrollBtn] = useState(false);
   const bottomRef = useRef(null);
+  const scrollAreaRef = useRef(null);
 
   // Persist onboarding completion across tab switches using sessionStorage
   const onboardingKey = `ai_dm_onboarded_${campaignId}_${sessionId}`;
