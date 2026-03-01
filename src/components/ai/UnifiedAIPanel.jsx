@@ -169,7 +169,8 @@ export default function UnifiedAIPanel({
     if (isAIDM && campaign?.long_campaign_mode && messages.length === 0 && !onboardingDone) {
       setOnboardingMode(true);
     }
-  }, [isAIDM, campaign, messages.length, onboardingDone]);
+    // If already done (loaded from sessionStorage), don't re-show onboarding
+  }, [isAIDM, campaign, messages.length]);
 
   async function loadPersistedMessages() {
     try {
