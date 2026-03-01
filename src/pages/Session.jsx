@@ -469,6 +469,38 @@ export default function Session() {
         )}
       </div>
 
+      <AlertDialog open={endSessionDialog} onOpenChange={setEndSessionDialog}>
+        <AlertDialogContent className="bg-slate-900 border-slate-700">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-white flex items-center gap-2"><X className="h-5 w-5 text-red-400" /> End Session & Create Episode</AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-400">
+              This will end the session and create an episode record. The AI will auto-generate a recap from the session log.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-3 my-2">
+            <input
+              type="text"
+              placeholder="Episode Title (optional)"
+              value={episodeTitle}
+              onChange={e => setEpisodeTitle(e.target.value)}
+              className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded text-white placeholder:text-slate-500 text-sm"
+            />
+            <textarea
+              placeholder="Episode Recap (optional — AI will generate one if left blank)"
+              value={episodeRecap}
+              onChange={e => setEpisodeRecap(e.target.value)}
+              className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded text-white placeholder:text-slate-500 text-sm h-20 resize-none"
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-slate-700 text-slate-300">Keep Open</AlertDialogCancel>
+            <AlertDialogAction onClick={handleEndSession} disabled={closingSession} className="bg-red-600 hover:bg-red-700">
+              {closingSession ? 'Saving Episode...' : 'End & Save'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <AlertDialog open={restDialog === 'short'} onOpenChange={() => setRestDialog(null)}>
         <AlertDialogContent className="bg-slate-900 border-slate-700">
           <AlertDialogHeader>
