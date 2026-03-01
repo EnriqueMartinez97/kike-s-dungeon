@@ -239,14 +239,27 @@ export default function Session() {
           )}
         </div>
 
-        <SessionHome
-          campaignId={campaignId}
-          isDM={isDM}
-          activeSession={activeSession}
-          onStartSession={session => { setActiveSession(session); setSessionTab(isAIMode ? 'ai-dm' : 'home'); }}
-          onCloseSession={() => { setActiveSession(null); loadData(); navigate(createPageUrl(`CampaignDetail?id=${campaignId}`)); }}
-          onRequestClose={fn => setTriggerEndSession(() => fn)}
-        />
+        {!activeSession && (
+          <SessionHome
+            campaignId={campaignId}
+            isDM={isDM}
+            onStartSession={session => { setActiveSession(session); setSessionTab(isAIMode ? 'ai-dm' : 'home'); }}
+            onCloseSession={() => { setActiveSession(null); loadData(); navigate(createPageUrl(`CampaignDetail?id=${campaignId}`)); }}
+          />
+        )}
+        {/* Hidden mount to allow End Session button to trigger episode creation dialog */}
+        {activeSession && (
+          <div className="hidden">
+            <SessionHome
+              campaignId={campaignId}
+              isDM={isDM}
+              activeSession={activeSession}
+              onStartSession={() => {}}
+              onCloseSession={() => { setActiveSession(null); loadData(); navigate(createPageUrl(`CampaignDetail?id=${campaignId}`)); }}
+              onRequestClose={fn => setTriggerEndSession(() => fn)}
+            />
+          </div>
+        )}
 
         {activeSession && (
           <>
