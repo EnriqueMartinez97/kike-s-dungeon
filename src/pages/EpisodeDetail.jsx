@@ -167,9 +167,14 @@ export default function EpisodeDetail() {
                 </Button>
               </>
             ) : (
-              <Button onClick={startEditing} variant="outline" className="border-slate-700 text-slate-300 hover:bg-slate-800">
-                <Edit className="h-4 w-4 mr-2" />Edit
-              </Button>
+              <>
+                <Button onClick={() => setDeleteOpen(true)} variant="outline" className="border-red-700 text-red-400 hover:bg-red-500/10">
+                  <Trash2 className="h-4 w-4 mr-2" />Delete
+                </Button>
+                <Button onClick={startEditing} variant="outline" className="border-slate-700 text-slate-300 hover:bg-slate-800">
+                  <Edit className="h-4 w-4 mr-2" />Edit
+                </Button>
+              </>
             )}
           </div>
         )}
