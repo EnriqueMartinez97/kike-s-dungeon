@@ -532,28 +532,40 @@ export default function CampaignDetail() {
           ) : (
             <div className="space-y-3">
               {episodes.map((ep) => (
-                <Link key={ep.id} to={createPageUrl(`EpisodeDetail?id=${ep.id}`)}>
-                  <Card className="bg-slate-900/50 border-slate-800 hover:border-violet-500/50 transition-all">
-                    <CardContent className="p-4 flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-lg bg-violet-500/10 flex items-center justify-center">
-                          <span className="text-violet-400 font-bold">#{ep.episode_number || 1}</span>
+                <div key={ep.id} className="relative group">
+                  <Link to={createPageUrl(`EpisodeDetail?id=${ep.id}`)}>
+                    <Card className="bg-slate-900/50 border-slate-800 hover:border-violet-500/50 transition-all">
+                      <CardContent className="p-4 flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-lg bg-violet-500/10 flex items-center justify-center">
+                            <span className="text-violet-400 font-bold">#{ep.episode_number || 1}</span>
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-white">{ep.name}</h3>
+                            <p className="text-sm text-slate-400">{ep.date || 'Date TBD'}</p>
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="font-semibold text-white">{ep.name}</h3>
-                          <p className="text-sm text-slate-400">{ep.date || 'Date TBD'}</p>
-                        </div>
-                      </div>
-                      <Badge className={`${
-                        ep.status === 'active' ? 'bg-emerald-500/20 text-emerald-300' :
-                        ep.status === 'completed' ? 'bg-slate-500/20 text-slate-300' :
-                        'bg-amber-500/20 text-amber-300'
-                      }`}>
-                        {ep.status || 'planned'}
-                      </Badge>
-                    </CardContent>
-                  </Card>
-                </Link>
+                        <Badge className={`${
+                          ep.status === 'active' ? 'bg-emerald-500/20 text-emerald-300' :
+                          ep.status === 'completed' ? 'bg-slate-500/20 text-slate-300' :
+                          'bg-amber-500/20 text-amber-300'
+                        }`}>
+                          {ep.status || 'planned'}
+                        </Badge>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                  {isDM && (
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-slate-500 hover:text-red-400 hover:bg-red-500/10 z-10"
+                      onClick={(e) => { e.preventDefault(); setDeleteEpisodeId(ep.id); }}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  )}
+                </div>
               ))}
             </div>
           )}
