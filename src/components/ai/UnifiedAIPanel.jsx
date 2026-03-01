@@ -472,16 +472,15 @@ export default function UnifiedAIPanel({
           <div className="flex gap-1">
             {isAIDM && messages.length > 0 && (
               <Button size="sm" variant="ghost" onClick={() => {
-                setMessages([]);
                 setIsRedoOnboarding(true);
                 setOnboardingAnswers({});
                 setAiDecideMode(false);
                 setOnboardingMode(true);
-              }} className="text-violet-400 h-7 px-2 text-xs" title="Clear and restart">
-                <RefreshCw className="h-3 w-3 mr-1" /> Clear
+              }} className="text-violet-400 h-7 px-2 text-xs" title="Restart session setup">
+                <RefreshCw className="h-3 w-3 mr-1" /> Restart
               </Button>
             )}
-            {!isAIDM && messages.length > 0 && (
+            {messages.length > 0 && (
               <Button size="sm" variant="ghost" onClick={() => {
                 setMessages([]);
               }} className="text-slate-500 h-7 px-2 text-xs">Clear</Button>
