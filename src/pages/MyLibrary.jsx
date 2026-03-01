@@ -68,9 +68,16 @@ export default function MyLibrary() {
   const [uploading, setUploading] = useState(false);
   const [newTag, setNewTag] = useState('');
 
-  // Attach dialog
+  // Attach dialog (single)
   const [attachDoc, setAttachDoc] = useState(null);
   const [attachCampaignIds, setAttachCampaignIds] = useState([]);
+
+  // Bulk link
+  const [bulkMode, setBulkMode] = useState(false);
+  const [selectedDocIds, setSelectedDocIds] = useState([]);
+  const [bulkLinkOpen, setBulkLinkOpen] = useState(false);
+  const [bulkCampaignIds, setBulkCampaignIds] = useState([]);
+  const [bulkSaving, setBulkSaving] = useState(false);
 
   // Delete
   const [deleteId, setDeleteId] = useState(null);
