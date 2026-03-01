@@ -17,14 +17,18 @@ export default function SessionHome({ campaignId, isDM, onStartSession, onCloseS
   useEffect(() => {
     if (onRequestClose) onRequestClose(() => setShowCloseDialog(true));
   }, [onRequestClose]);
-   const [activeSession, setActiveSession] = useState(null);
+   const [activeSession, setActiveSession] = useState(activeSessionProp || null);
    const [campaign, setCampaign] = useState(null);
    const [members, setMembers] = useState([]);
    const [showCloseDialog, setShowCloseDialog] = useState(false);
    const [episodeTitle, setEpisodeTitle] = useState('');
    const [episodeRecap, setEpisodeRecap] = useState('');
-   const [interviewAnswers, setInterviewAnswers] = useState({});
    const [closing, setClosing] = useState(false);
+
+   // Sync from parent when activeSessionProp changes
+   useEffect(() => {
+     if (activeSessionProp !== undefined) setActiveSession(activeSessionProp);
+   }, [activeSessionProp?.id]);
 
   useEffect(() => {
     loadSessionData();
