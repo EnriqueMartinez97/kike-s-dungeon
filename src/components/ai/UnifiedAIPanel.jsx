@@ -539,6 +539,7 @@ export default function UnifiedAIPanel({
         </button>
       )}
       </div>
+      {/* end scroll wrapper */}
 
       <div className="p-3 border-t border-slate-800 flex-shrink-0">
         {isAIDM && (
