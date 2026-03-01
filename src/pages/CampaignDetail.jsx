@@ -880,6 +880,18 @@ export default function CampaignDetail() {
               This will permanently delete this session record from the history. This cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <div className="my-4 flex items-center gap-3 p-3 rounded bg-slate-800/50 border border-slate-700">
+            <input
+              type="checkbox"
+              id="deleteEpisode"
+              checked={deleteSessionDeleteEpisode}
+              onChange={(e) => setDeleteSessionDeleteEpisode(e.target.checked)}
+              className="w-4 h-4"
+            />
+            <label htmlFor="deleteEpisode" className="text-sm text-slate-300 cursor-pointer flex-1">
+              Also delete associated episode?
+            </label>
+          </div>
           <AlertDialogFooter>
             <AlertDialogCancel className="border-slate-700 text-slate-300">Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeleteSession} className="bg-red-600 hover:bg-red-700">Delete</AlertDialogAction>
