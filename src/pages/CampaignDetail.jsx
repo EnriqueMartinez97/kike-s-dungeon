@@ -670,6 +670,70 @@ export default function CampaignDetail() {
           </TabsContent>
         )}
 
+        {isDM && (
+          <TabsContent value="session-history">
+            <h2 className="text-xl font-bold text-white mb-4">Session History</h2>
+            {sessionHistory.length === 0 ? (
+              <Card className="bg-slate-900/50 border-slate-800">
+                <CardContent className="p-8 text-center">
+                  <History className="h-12 w-12 text-slate-700 mx-auto mb-4" />
+                  <p className="text-slate-400">No completed sessions yet.</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-3">
+                {sessionHistory.map((session, i) => {
+                  const start = new Date(session.session_start);
+                  const end = session.session_end ? new Date(session.session_end) : null;
+                  const ms = end ? end - start : null;
+                  const hrs = ms ? Math.floor(ms / 3600000) : null;
+                  const mins = ms ? Math.floor((ms % 3600000) / 60000) : null;
+                  const duration = ms ? (hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`) : 'Unknown duration';
+                  return (
+                    <Card key={session.id} className="bg-slate-900/50 border-slate-800">
+                      <CardContent className="p-4 flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                            <Clock className="h-5 w-5 text-emerald-400" />
+                          </div>
+                          <div>
+                            <p className="font-semibold text-white">
+                              Session {sessionHistory.length - i}
+                            </p>
+                            <p className="text-sm text-slate-400">
+                              {start.toLocaleDateString()} · {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              {end && ` → ${end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
+                            </p>
+                          </div>
+                        </div>
+                        <Badge className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                          {duration}
+                        </Badge>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+                <Card className="bg-slate-800/30 border-slate-800">
+                  <CardContent className="p-4 flex items-center justify-between">
+                    <span className="text-slate-400 font-medium">Total time played</span>
+                    <span className="text-white font-bold">
+                      {(() => {
+                        const totalMs = sessionHistory.reduce((acc, s) => {
+                          if (!s.session_start || !s.session_end) return acc;
+                          return acc + (new Date(s.session_end) - new Date(s.session_start));
+                        }, 0);
+                        const h = Math.floor(totalMs / 3600000);
+                        const m = Math.floor((totalMs % 3600000) / 60000);
+                        return h > 0 ? `${h}h ${m}m` : `${m}m`;
+                      })()}
+                    </span>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </TabsContent>
+        )}
+
         <TabsContent value="members">
           <h2 className="text-xl font-bold text-white mb-4">Campaign Members</h2>
           <div className="space-y-3">
