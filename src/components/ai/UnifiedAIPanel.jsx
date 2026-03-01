@@ -273,36 +273,76 @@ export default function UnifiedAIPanel({
 
   if (onboardingMode && isAIDM) {
     return (
-      <Card className={`bg-slate-900/50 ${borderCls} flex flex-col`} style={{ height: '520px' }}>
+      <Card className={`bg-slate-900/50 ${borderCls} flex flex-col`} style={{ height: aiDecideMode ? '400px' : '520px' }}>
         <CardHeader className="border-b border-slate-800 flex-shrink-0">
           <CardTitle className="text-white flex items-center gap-2">
-            <Crown className="h-5 w-5 text-violet-400" /> Session Setup
+            <Crown className="h-5 w-5 text-violet-400" />
+            {aiDecideMode ? 'What do you want?' : 'Session Setup'}
           </CardTitle>
-          <p className="text-xs text-slate-400">Help the AI DM prepare for your session</p>
+          <p className="text-xs text-slate-400">
+            {aiDecideMode ? 'Tell the AI DM what you\'re in the mood for and it will craft the session.' : 'Help the AI DM prepare for your session'}
+          </p>
         </CardHeader>
-        <div className="flex-1 overflow-auto p-4 space-y-4">
-          {ONBOARDING_QUESTIONS.map(q => (
-            <div key={q.key}>
-              <label className="text-sm text-slate-300 block mb-1 font-medium">{q.label}</label>
+
+        {aiDecideMode ? (
+          <>
+            <div className="flex-1 overflow-auto p-4">
               <Textarea
-                value={onboardingAnswers[q.key] || ''}
-                onChange={e => setOnboardingAnswers(p => ({ ...p, [q.key]: e.target.value }))}
-                placeholder={q.placeholder}
-                className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 text-sm min-h-[56px] resize-none"
+                value={aiDecideInput}
+                onChange={e => setAiDecideInput(e.target.value)}
+                placeholder="e.g. Something intense with the thieves guild, or a relaxed social session in the city..."
+                className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 text-sm min-h-[120px] resize-none w-full"
+                autoFocus
               />
             </div>
-          ))}
-        </div>
-        <div className="border-t border-slate-800 p-4 flex-shrink-0">
-          <Button
-            onClick={completeOnboarding}
-            disabled={loading || !ONBOARDING_QUESTIONS.every(q => onboardingAnswers[q.key]?.trim())}
-            className="w-full bg-violet-600 hover:bg-violet-700"
-          >
-            {loading ? <Loader className="h-4 w-4 animate-spin mr-2" /> : <Sparkles className="h-4 w-4 mr-2" />}
-            Begin Session
-          </Button>
-        </div>
+            <div className="border-t border-slate-800 p-4 flex-shrink-0 flex gap-2">
+              <Button variant="outline" onClick={() => setAiDecideMode(false)} className="border-slate-600 text-slate-300 flex-1">
+                Back
+              </Button>
+              <Button
+                onClick={completeAiDecide}
+                disabled={loading || !aiDecideInput.trim()}
+                className="flex-1 bg-violet-600 hover:bg-violet-700"
+              >
+                {loading ? <Loader className="h-4 w-4 animate-spin mr-2" /> : <Sparkles className="h-4 w-4 mr-2" />}
+                Let AI Decide
+              </Button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flex-1 overflow-auto p-4 space-y-4">
+              {ONBOARDING_QUESTIONS.map(q => (
+                <div key={q.key}>
+                  <label className="text-sm text-slate-300 block mb-1 font-medium">{q.label}</label>
+                  <Textarea
+                    value={onboardingAnswers[q.key] || ''}
+                    onChange={e => setOnboardingAnswers(p => ({ ...p, [q.key]: e.target.value }))}
+                    placeholder={q.placeholder}
+                    className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 text-sm min-h-[56px] resize-none"
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="border-t border-slate-800 p-4 flex-shrink-0 flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setAiDecideMode(true)}
+                className="flex-1 border-violet-500/40 text-violet-300 hover:bg-violet-500/10"
+              >
+                <Sparkles className="h-4 w-4 mr-2" /> Let AI Decide
+              </Button>
+              <Button
+                onClick={completeOnboarding}
+                disabled={loading || !ONBOARDING_QUESTIONS.every(q => onboardingAnswers[q.key]?.trim())}
+                className="flex-1 bg-violet-600 hover:bg-violet-700"
+              >
+                {loading ? <Loader className="h-4 w-4 animate-spin mr-2" /> : <Crown className="h-4 w-4 mr-2" />}
+                Begin Session
+              </Button>
+            </div>
+          </>
+        )}
       </Card>
     );
   }
