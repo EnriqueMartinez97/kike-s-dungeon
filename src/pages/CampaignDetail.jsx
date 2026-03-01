@@ -105,6 +105,10 @@ export default function CampaignDetail() {
 
       setAllMemberships(allMembershipsForCampaign);
       setMembers(memberList);
+      const closedSessions = await base44.entities.ActiveSession.filter({ campaign_id: campaignId, status: 'closed' });
+      closedSessions.sort((a, b) => new Date(b.session_start) - new Date(a.session_start));
+      setSessionHistory(closedSessions);
+
       setCharacters(chars);
       setEpisodes(eps);
       setQuests(qsts);
