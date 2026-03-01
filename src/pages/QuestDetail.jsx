@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import {
-  ArrowLeft, Map, Edit, Save, X, CheckCircle, Circle, Plus, Trash2
+  ArrowLeft, Map, Edit, Save, X, CheckCircle, Circle, Plus, Trash2, AlertTriangle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
