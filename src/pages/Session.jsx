@@ -516,9 +516,9 @@ export default function Session() {
           </div>
           <AlertDialogFooter>
             <AlertDialogCancel className="border-slate-700 text-slate-300">Keep Open</AlertDialogCancel>
-            <AlertDialogAction onClick={handleEndSession} disabled={closingSession} className="bg-red-600 hover:bg-red-700">
+            <Button onClick={handleEndSession} disabled={closingSession} className="bg-red-600 hover:bg-red-700">
               {closingSession ? 'Saving Episode...' : 'End & Save'}
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
