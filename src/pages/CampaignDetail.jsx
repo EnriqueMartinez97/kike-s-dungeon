@@ -191,9 +191,16 @@ export default function CampaignDetail() {
 
   const handleDeleteSession = async () => {
     if (!deleteSessionId) return;
+    const sessionToDelete = sessionHistory.find(s => s.id === deleteSessionId);
     await base44.entities.ActiveSession.delete(deleteSessionId);
+    if (deleteSessionDeleteEpisode && sessionToDelete) {
+      const relatedEpisodes = episodes.filter(e => e.date === new Date(sessionToDelete.session_start).toISOString().split('T')[0]);
+      await Promise.all(relatedEpisodes.map(ep => base44.entities.Episode.delete(ep.id)));
+      setEpisodes(prev => prev.filter(e => !relatedEpisodes.find(re => re.id === e.id)));
+    }
     setSessionHistory(prev => prev.filter(s => s.id !== deleteSessionId));
     setDeleteSessionId(null);
+    setDeleteSessionDeleteEpisode(false);
   };
 
   const formatDuration = (start, end) => {
