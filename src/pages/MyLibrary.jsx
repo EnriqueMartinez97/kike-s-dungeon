@@ -269,7 +269,7 @@ export default function MyLibrary() {
                       <Badge className={`border text-xs ${doc.access_level === 'dm_only' ? 'bg-red-500/20 text-red-300 border-red-500/30' : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'}`}>
                         {doc.access_level === 'dm_only' ? <><Lock className="h-3 w-3 mr-1" />DM Only</> : <><Users className="h-3 w-3 mr-1" />Players</>}
                       </Badge>
-                      {getDocCampaignIds(doc).map(cid => (
+                      {getDocCampaignIds(doc).filter(cid => campaigns.find(c => c.id === cid)).map(cid => (
                         <Badge key={cid} className="border text-xs bg-violet-500/20 text-violet-300 border-violet-500/30">
                           <Link className="h-3 w-3 mr-1" />{getCampaignName(cid)}
                         </Badge>
