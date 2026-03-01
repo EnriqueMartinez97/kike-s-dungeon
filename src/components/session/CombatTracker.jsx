@@ -217,7 +217,7 @@ export default function CombatTracker({
     return 'bg-red-500';
   };
 
-  if (!combatActive) {
+  if (!_combatActive) {
     return (
       <>
         <Card className="bg-slate-900/50 border-slate-800">
