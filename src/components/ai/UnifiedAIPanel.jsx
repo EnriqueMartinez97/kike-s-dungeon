@@ -150,6 +150,7 @@ export default function UnifiedAIPanel({
   const [collapsed, setCollapsed] = useState(false);
   const [onboardingMode, setOnboardingMode] = useState(false);
   const [onboardingAnswers, setOnboardingAnswers] = useState({});
+  const [isRedoOnboarding, setIsRedoOnboarding] = useState(false);
   const [aiDecideMode, setAiDecideMode] = useState(false);
   const [aiDecideInput, setAiDecideInput] = useState('');
   const [editingId, setEditingId] = useState(null);
