@@ -111,7 +111,7 @@ export default function CombatTracker({
   };
 
   const applyAction = async () => {
-    const target = combatants.find(c => c.id === showActionDialog);
+    const target = _combatants.find(c => c.id === showActionDialog);
     if (!target) return;
 
     let newHp = target.hp;
@@ -135,24 +135,24 @@ export default function CombatTracker({
       newTempHp = parseInt(actionData.amount) || 0;
       addLog('DM', `Temp HP: ${newTempHp} → ${target.name}`);
     } else if (actionData.type === 'condition_add' && actionData.condition) {
-      const updated = combatants.map(c => c.id === target.id
+      const updated = _combatants.map(c => c.id === target.id
         ? { ...c, conditions: [...(c.conditions || []), actionData.condition] } : c);
       updateCombatants(updated);
       addLog('DM', `${actionData.condition} added to ${target.name}`);
       closeAction(); return;
     } else if (actionData.type === 'condition_remove' && actionData.condition) {
-      const updated = combatants.map(c => c.id === target.id
+      const updated = _combatants.map(c => c.id === target.id
         ? { ...c, conditions: (c.conditions || []).filter(x => x !== actionData.condition) } : c);
       updateCombatants(updated);
       addLog('DM', `${actionData.condition} removed from ${target.name}`);
       closeAction(); return;
     } else if (actionData.type === 'note') {
-      const updated = combatants.map(c => c.id === target.id ? { ...c, notes: actionData.note } : c);
+      const updated = _combatants.map(c => c.id === target.id ? { ...c, notes: actionData.note } : c);
       updateCombatants(updated);
       closeAction(); return;
     }
 
-    const updated = combatants.map(c => c.id === target.id
+    const updated = _combatants.map(c => c.id === target.id
       ? { ...c, hp: newHp, temp_hp: newTempHp } : c);
     updateCombatants(updated);
 
