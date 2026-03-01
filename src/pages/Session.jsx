@@ -239,15 +239,14 @@ export default function Session() {
           )}
         </div>
 
-        <div className={activeSession ? 'hidden' : ''}>
-          <SessionHome
-            campaignId={campaignId}
-            isDM={isDM}
-            onStartSession={session => { setActiveSession(session); setSessionTab(isAIMode ? 'ai-dm' : 'home'); }}
-            onCloseSession={() => { setActiveSession(null); loadData(); navigate(createPageUrl(`CampaignDetail?id=${campaignId}`)); }}
-            onRequestClose={fn => setTriggerEndSession(() => fn)}
-          />
-        </div>
+        <SessionHome
+          campaignId={campaignId}
+          isDM={isDM}
+          activeSession={activeSession}
+          onStartSession={session => { setActiveSession(session); setSessionTab(isAIMode ? 'ai-dm' : 'home'); }}
+          onCloseSession={() => { setActiveSession(null); loadData(); navigate(createPageUrl(`CampaignDetail?id=${campaignId}`)); }}
+          onRequestClose={fn => setTriggerEndSession(() => fn)}
+        />
 
         {activeSession && (
           <>
