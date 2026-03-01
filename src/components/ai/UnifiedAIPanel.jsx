@@ -184,6 +184,16 @@ export default function UnifiedAIPanel({
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, [messages]);
 
+  function handleScroll(e) {
+    const el = e.target;
+    const distFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+    setShowScrollBtn(distFromBottom > 120);
+  }
+
+  function scrollToBottom() {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
   // Check if any previous AI DM messages exist for this campaign (not just this session)
   const [checkedPriorHistory, setCheckedPriorHistory] = useState(false);
   useEffect(() => {
