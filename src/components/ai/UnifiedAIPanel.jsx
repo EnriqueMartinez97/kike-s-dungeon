@@ -244,11 +244,16 @@ export default function UnifiedAIPanel({
   }
 
   async function completeOnboarding() {
-    if (!ONBOARDING_QUESTIONS.every(q => onboardingAnswers[q.key]?.trim())) return;
-    const context = ONBOARDING_QUESTIONS.map(q => `${q.label}: ${onboardingAnswers[q.key]}`).join('\n');
+    const questions = isRedoOnboarding ? REDO_QUESTIONS : ONBOARDING_QUESTIONS;
+    if (!questions.every(q => onboardingAnswers[q.key]?.trim())) return;
+    const context = questions.map(q => `${q.label}: ${onboardingAnswers[q.key]}`).join('\n');
     setOnboardingMode(false);
+    setIsRedoOnboarding(false);
     setOnboardingDone(true);
-    const prompt = `${getSystemPrompt(context)}\n\nOpen the session with an atmospheric, immersive scene based on the setup context. Use second-person narration. End with an invitation for player action.`;
+    const continuityNote = isRedoOnboarding
+      ? `\n\nIMPORTANT: This is a continuation of an existing campaign with prior sessions. Maintain all established story, characters, lore, and continuity. Only the tone/mood and goals below are being adjusted for this session.`
+      : '';
+    const prompt = `${getSystemPrompt(context)}${continuityNote}\n\nOpen the session with an atmospheric, immersive scene based on the setup context. Use second-person narration. End with an invitation for player action.`;
     await launchOpeningNarration(prompt);
   }
 
