@@ -42,6 +42,8 @@ export default function SessionLog({ campaignId, sessionId, isDM, userId, userNa
   const [newLogOpen, setNewLogOpen] = useState(false);
   const [newLogType, setNewLogType] = useState('DM_MESSAGE');
   const [newLogContent, setNewLogContent] = useState('');
+  const [editingLogId, setEditingLogId] = useState(null);
+  const [editContent, setEditContent] = useState('');
   const [playerMsgInput, setPlayerMsgInput] = useState('');
   const [sendingMsg, setSendingMsg] = useState(false);
   const bottomRef = useRef(null);
@@ -50,10 +52,8 @@ export default function SessionLog({ campaignId, sessionId, isDM, userId, userNa
     loadLogs();
     const unsub = base44.entities.SessionLog.subscribe((event) => {
       if (event.data?.campaign_id !== campaignId) return;
-      
       const log = event.data;
       const isVisible = isDM || log.visibility !== 'dm_only' || (log.visibility === 'private' && log.user_id === userId);
-      
       if (event.type === 'create' && isVisible) {
         setLogs(prev => [...prev, log]);
       }
@@ -72,14 +72,12 @@ export default function SessionLog({ campaignId, sessionId, isDM, userId, userNa
         campaign_id: campaignId,
         session_id: sessionId
       });
-      
       const visible = allLogs.filter(log => {
         if (isDM) return true;
         if (log.visibility === 'dm_only') return false;
         if (log.visibility === 'private' && log.user_id !== userId) return false;
         return true;
       });
-      
       visible.sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
       setLogs(visible);
     } finally {
@@ -117,7 +115,6 @@ export default function SessionLog({ campaignId, sessionId, isDM, userId, userNa
 
   const handleAddLog = async () => {
     if (!newLogContent.trim() || !isDM) return;
-
     await base44.entities.SessionLog.create({
       campaign_id: campaignId,
       session_id: sessionId,
@@ -126,26 +123,18 @@ export default function SessionLog({ campaignId, sessionId, isDM, userId, userNa
       content: newLogContent.trim(),
       visibility: 'public'
     });
-
     setNewLogContent('');
     setNewLogOpen(false);
   };
 
   const handleEditLog = async (logId) => {
     if (!editContent.trim() || !isDM) return;
-
     const log = logs.find(l => l.id === logId);
     if (!log) return;
-
     await base44.entities.SessionLog.update(logId, {
       content: editContent.trim(),
-      metadata: {
-        ...(log.metadata || {}),
-        dm_edited: true,
-        original_content: log.content
-      }
+      metadata: { ...(log.metadata || {}), dm_edited: true, original_content: log.content }
     });
-
     setEditingLogId(null);
     setEditContent('');
     loadLogs();
@@ -153,30 +142,18 @@ export default function SessionLog({ campaignId, sessionId, isDM, userId, userNa
 
   const getLogContent = (log) => {
     const m = log.metadata || {};
-    
     switch (log.entry_type) {
-      case 'ROLL':
-        return `${log.user_name} rolled ${m.roll_formula}: **${m.roll_result}**`;
-      case 'DAMAGE':
-        return `${log.user_name} dealt ${m.damage_amount} ${m.damage_type} damage to ${m.target_name}`;
-      case 'HEAL':
-        return `${log.user_name} healed ${m.target_name} for ${m.damage_amount} HP`;
-      case 'STATUS_CHANGE':
-        return `${log.user_name} changed ${m.field_changed} from ${m.before_value} to ${m.after_value}`;
-      case 'INITIATIVE':
-        return `${log.user_name} rolled initiative: ${m.initiative_roll}`;
-      case 'COMBAT_START':
-        return 'Combat started!';
-      case 'COMBAT_END':
-        return 'Combat ended!';
-      case 'DM_MESSAGE':
-        return `DM: ${log.content}`;
-      case 'PRIVATE_MESSAGE':
-        return `Private message to ${m.target_name}: ${log.content}`;
-      case 'NOTE':
-        return `Note: ${log.content}`;
-      default:
-        return log.content;
+      case 'ROLL': return `${log.user_name} rolled ${m.roll_formula}: **${m.roll_result}**`;
+      case 'DAMAGE': return `${log.user_name} dealt ${m.damage_amount} ${m.damage_type} damage to ${m.target_name}`;
+      case 'HEAL': return `${log.user_name} healed ${m.target_name} for ${m.damage_amount} HP`;
+      case 'STATUS_CHANGE': return `${log.user_name} changed ${m.field_changed} from ${m.before_value} to ${m.after_value}`;
+      case 'INITIATIVE': return `${log.user_name} rolled initiative: ${m.initiative_roll}`;
+      case 'COMBAT_START': return 'Combat started!';
+      case 'COMBAT_END': return 'Combat ended!';
+      case 'DM_MESSAGE': return `${log.user_name || 'DM'}: ${log.content}`;
+      case 'PRIVATE_MESSAGE': return `Private message to ${m.target_name}: ${log.content}`;
+      case 'NOTE': return `Note: ${log.content}`;
+      default: return log.content;
     }
   };
 
@@ -202,21 +179,11 @@ export default function SessionLog({ campaignId, sessionId, isDM, userId, userNa
                   {isDM && <SelectItem value="dm_only">DM Only</SelectItem>}
                 </SelectContent>
               </Select>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={loadLogs}
-                className="h-8 w-8 text-slate-400 hover:text-white"
-              >
+              <Button variant="ghost" size="icon" onClick={loadLogs} className="h-8 w-8 text-slate-400 hover:text-white">
                 <RotateCcw className="h-4 w-4" />
               </Button>
               {isDM && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setNewLogOpen(true)}
-                  className="h-8 w-8 text-slate-400 hover:text-white"
-                >
+                <Button variant="ghost" size="icon" onClick={() => setNewLogOpen(true)} className="h-8 w-8 text-slate-400 hover:text-white">
                   <Plus className="h-4 w-4" />
                 </Button>
               )}
@@ -227,66 +194,34 @@ export default function SessionLog({ campaignId, sessionId, isDM, userId, userNa
         <ScrollArea className="flex-1">
           <div className="space-y-2 p-4">
             {loading && <p className="text-slate-500 text-sm">Loading logs...</p>}
-
             {!loading && filteredLogs.length === 0 && (
               <p className="text-slate-500 text-sm text-center py-6">No log entries yet</p>
             )}
-
             {filteredLogs.map((log) => (
-              <div
-                key={log.id}
-                className={`border rounded-md p-3 text-sm text-white ${LOG_COLORS[log.entry_type]}`}
-              >
+              <div key={log.id} className={`border rounded-md p-3 text-sm text-white ${LOG_COLORS[log.entry_type] || 'bg-slate-800/50 border-slate-700'}`}>
                 {editingLogId === log.id ? (
                   <div className="space-y-2">
-                    <Textarea
-                      value={editContent}
-                      onChange={(e) => setEditContent(e.target.value)}
-                      className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 min-h-[60px] text-sm"
-                    />
+                    <Textarea value={editContent} onChange={(e) => setEditContent(e.target.value)}
+                      className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 min-h-[60px] text-sm" />
                     <div className="flex gap-2 justify-end">
-                      <Button
-                        onClick={() => setEditingLogId(null)}
-                        variant="outline"
-                        size="sm"
-                        className="border-slate-600 text-xs text-white"
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        onClick={() => handleEditLog(log.id)}
-                        size="sm"
-                        className="bg-violet-600 hover:bg-violet-700 text-xs"
-                      >
-                        Save
-                      </Button>
+                      <Button onClick={() => setEditingLogId(null)} variant="outline" size="sm" className="border-slate-600 text-xs text-white">Cancel</Button>
+                      <Button onClick={() => handleEditLog(log.id)} size="sm" className="bg-violet-600 hover:bg-violet-700 text-xs">Save</Button>
                     </div>
                   </div>
                 ) : (
                   <>
                     <div className="flex items-start justify-between gap-2">
-                       <div className="flex-1 min-w-0">
-                         <p className="leading-relaxed break-words text-white">{getLogContent(log)}</p>
-                       </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="leading-relaxed break-words text-white">{getLogContent(log)}</p>
+                      </div>
                       <div className="flex items-center gap-2">
                         {log.metadata?.dm_edited && (
-                          <Badge variant="outline" className="text-xs bg-amber-500/10 text-amber-200 border-amber-500/20 flex-shrink-0">
-                            DM Edited
-                          </Badge>
+                          <Badge variant="outline" className="text-xs bg-amber-500/10 text-amber-200 border-amber-500/20 flex-shrink-0">DM Edited</Badge>
                         )}
-                        <Badge variant="outline" className="flex-shrink-0 text-xs">
-                          {log.entry_type}
-                        </Badge>
+                        <Badge variant="outline" className="flex-shrink-0 text-xs">{log.entry_type}</Badge>
                         {isDM && (
-                          <Button
-                            onClick={() => {
-                              setEditingLogId(log.id);
-                              setEditContent(log.content);
-                            }}
-                            variant="ghost"
-                            size="icon"
-                            className="h-5 w-5 text-slate-400 hover:text-white flex-shrink-0"
-                          >
+                          <Button onClick={() => { setEditingLogId(log.id); setEditContent(log.content); }}
+                            variant="ghost" size="icon" className="h-5 w-5 text-slate-400 hover:text-white flex-shrink-0">
                             <Edit className="h-3 w-3" />
                           </Button>
                         )}
@@ -299,12 +234,10 @@ export default function SessionLog({ campaignId, sessionId, isDM, userId, userNa
                 )}
               </div>
             ))}
-
             <div ref={bottomRef} />
           </div>
         </ScrollArea>
 
-        {/* Message input — all players can post to the shared feed */}
         <div className="border-t border-slate-800 p-3 flex-shrink-0">
           <div className="flex gap-2">
             <Input
@@ -320,56 +253,42 @@ export default function SessionLog({ campaignId, sessionId, isDM, userId, userNa
             </Button>
           </div>
         </div>
-        </Card>
+      </Card>
 
-      {/* Add Log Dialog */}
       <Dialog open={newLogOpen} onOpenChange={setNewLogOpen}>
-      <DialogContent className="bg-slate-900 border-slate-800">
-        <DialogHeader>
-          <DialogTitle className="text-white">Add Log Entry</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-3">
-          <div>
-            <label className="text-xs text-slate-400 mb-1 block">Type</label>
-            <Select value={newLogType} onValueChange={setNewLogType}>
-              <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-slate-900 border-slate-700">
-                <SelectItem value="DM_MESSAGE">DM Message</SelectItem>
-                <SelectItem value="COMBAT_START">Combat Start</SelectItem>
-                <SelectItem value="COMBAT_END">Combat End</SelectItem>
-                <SelectItem value="DAMAGE">Damage</SelectItem>
-                <SelectItem value="HEAL">Heal</SelectItem>
-                <SelectItem value="STATUS_CHANGE">Status Change</SelectItem>
-                <SelectItem value="NOTE">Note</SelectItem>
-              </SelectContent>
-            </Select>
+        <DialogContent className="bg-slate-900 border-slate-800">
+          <DialogHeader>
+            <DialogTitle className="text-white">Add Log Entry</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs text-slate-400 mb-1 block">Type</label>
+              <Select value={newLogType} onValueChange={setNewLogType}>
+                <SelectTrigger className="bg-slate-800 border-slate-700 text-white"><SelectValue /></SelectTrigger>
+                <SelectContent className="bg-slate-900 border-slate-700">
+                  <SelectItem value="DM_MESSAGE">DM Message</SelectItem>
+                  <SelectItem value="COMBAT_START">Combat Start</SelectItem>
+                  <SelectItem value="COMBAT_END">Combat End</SelectItem>
+                  <SelectItem value="DAMAGE">Damage</SelectItem>
+                  <SelectItem value="HEAL">Heal</SelectItem>
+                  <SelectItem value="STATUS_CHANGE">Status Change</SelectItem>
+                  <SelectItem value="NOTE">Note</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-xs text-slate-400 mb-1 block">Content</label>
+              <Textarea value={newLogContent} onChange={(e) => setNewLogContent(e.target.value)}
+                placeholder="Enter log content..."
+                className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 min-h-[80px]" />
+            </div>
           </div>
-          <div>
-            <label className="text-xs text-slate-400 mb-1 block">Content</label>
-            <Textarea
-              value={newLogContent}
-              onChange={(e) => setNewLogContent(e.target.value)}
-              placeholder="Enter log content..."
-              className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 min-h-[80px]"
-            />
-          </div>
-        </div>
-        <DialogFooter className="gap-2">
-          <Button onClick={() => setNewLogOpen(false)} variant="outline" className="border-slate-600 text-white">
-            Cancel
-          </Button>
-          <Button 
-            onClick={handleAddLog}
-            disabled={!newLogContent.trim()}
-            className="bg-violet-600 hover:bg-violet-700"
-          >
-            Add Entry
-          </Button>
-        </DialogFooter>
-      </DialogContent>
+          <DialogFooter className="gap-2">
+            <Button onClick={() => setNewLogOpen(false)} variant="outline" className="border-slate-600 text-white">Cancel</Button>
+            <Button onClick={handleAddLog} disabled={!newLogContent.trim()} className="bg-violet-600 hover:bg-violet-700">Add Entry</Button>
+          </DialogFooter>
+        </DialogContent>
       </Dialog>
-      </>
-      );
-      }
+    </>
+  );
+}

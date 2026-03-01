@@ -21,7 +21,6 @@ const CONDITIONS = [
   'Poisoned','Prone','Restrained','Stunned','Unconscious'
 ];
 
-// Sync HP change to character sheet in DB (fire-and-forget)
 async function syncCharacterHP(combatant, newHp) {
   if (!combatant.characterId) return;
   try {
@@ -36,7 +35,7 @@ export default function CombatTracker({
   npcs = [],
   isDM,
   campaignId,
-  onCombatStateChange, // lifted state for AI context
+  onCombatStateChange,
 }) {
   const [combatActive, setCombatActive] = useState(false);
   const [round, setRound] = useState(1);
@@ -45,17 +44,13 @@ export default function CombatTracker({
   const [combatLog, setCombatLog] = useState([]);
   const [showInitiativeDialog, setShowInitiativeDialog] = useState(false);
   const [showAddCombatant, setShowAddCombatant] = useState(false);
-  const [showActionDialog, setShowActionDialog] = useState(null); // combatant id
+  const [showActionDialog, setShowActionDialog] = useState(null);
   const [newCombatant, setNewCombatant] = useState({ name: '', initiative: '', hp: '', ac: '', type: 'npc' });
   const [actionData, setActionData] = useState({ type: 'damage', amount: '', condition: '', note: '' });
 
   const notifyStateChange = useCallback((updatedCombatants, isActive, currentRound) => {
     if (onCombatStateChange) {
-      onCombatStateChange({
-        active: isActive,
-        round: currentRound,
-        combatants: updatedCombatants,
-      });
+      onCombatStateChange({ active: isActive, round: currentRound, combatants: updatedCombatants });
     }
   }, [onCombatStateChange]);
 
@@ -142,7 +137,6 @@ export default function CombatTracker({
       ? { ...c, hp: newHp, temp_hp: newTempHp } : c);
     updateCombatants(updated);
 
-    // Sync to character sheet if player character
     if (actionData.type === 'damage' || actionData.type === 'heal') {
       await syncCharacterHP(target, newHp);
     }
@@ -167,7 +161,6 @@ export default function CombatTracker({
 
   const addCombatant = () => {
     if (!newCombatant.name) return;
-    // Auto-match to existing character/NPC for sync
     const matchedChar = characters.find(c => c.name.toLowerCase() === newCombatant.name.toLowerCase());
     const matchedNpc = npcs.find(n => n.name.toLowerCase() === newCombatant.name.toLowerCase());
     const c = {
@@ -180,7 +173,7 @@ export default function CombatTracker({
       ac: matchedChar ? matchedChar.ac : (matchedNpc ? matchedNpc.stat_block?.ac : parseInt(newCombatant.ac)) || 10,
       conditions: [],
       type: newCombatant.type,
-      characterId: matchedChar?.id || null, // for DB sync
+      characterId: matchedChar?.id || null,
       notes: ''
     };
     const updated = sortByInitiative([...combatants, c]);
@@ -342,7 +335,6 @@ export default function CombatTracker({
         </CardContent>
       </Card>
 
-      {/* Combat Log */}
       {combatLog.length > 0 && (
         <Card className="bg-slate-900/50 border-slate-800">
           <CardHeader className="pb-2"><CardTitle className="text-white text-xs">Combat Log</CardTitle></CardHeader>
@@ -361,7 +353,6 @@ export default function CombatTracker({
         </Card>
       )}
 
-      {/* Add Combatant Dialog */}
       <Dialog open={showAddCombatant} onOpenChange={setShowAddCombatant}>
         <DialogContent className="bg-slate-900 border-slate-700">
           <DialogHeader><DialogTitle className="text-white">Add Combatant</DialogTitle></DialogHeader>
@@ -370,7 +361,6 @@ export default function CombatTracker({
               <Label className="text-slate-300 text-xs">Name</Label>
               <Input value={newCombatant.name} onChange={e => setNewCombatant(p => ({ ...p, name: e.target.value }))}
                 placeholder="Character/NPC name (auto-fills from roster)" className="bg-slate-800 border-slate-700 text-white" />
-              {/* Suggestions */}
               {newCombatant.name.length > 1 && (
                 <div className="mt-1 space-y-1">
                   {[...characters, ...npcs].filter(x => x.name.toLowerCase().startsWith(newCombatant.name.toLowerCase())).slice(0, 3).map(x => (
@@ -406,7 +396,6 @@ export default function CombatTracker({
         </DialogContent>
       </Dialog>
 
-      {/* Action Dialog */}
       {showActionDialog && (() => {
         const target = combatants.find(c => c.id === showActionDialog);
         if (!target) return null;

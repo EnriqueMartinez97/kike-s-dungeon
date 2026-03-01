@@ -39,12 +39,10 @@ export default function Session() {
   const [loading, setLoading] = useState(true);
   const [sessionTab, setSessionTab] = useState('home');
 
-  // Live state for AI context
   const [combatState, setCombatState] = useState(null);
   const [recentRolls, setRecentRolls] = useState([]);
 
-  // Rest dialogs
-  const [restDialog, setRestDialog] = useState(null); // 'short' | 'long'
+  const [restDialog, setRestDialog] = useState(null);
   const [restingId, setRestingId] = useState(null);
 
   const navigate = useNavigate();
@@ -98,10 +96,8 @@ export default function Session() {
   const isDM = membership?.role === 'dm' || membership?.role === 'co_dm';
   const isAIMode = campaign?.mode === 'dm_absent';
 
-  // Lifted combat state for AI context
   const handleCombatStateChange = useCallback((state) => setCombatState(state), []);
 
-  // Dice roll logging + AI context
   const handleDiceRoll = useCallback(async (result) => {
     const rollEntry = { ...result, user_name: user?.full_name || user?.display_name || 'Player' };
     setRecentRolls(prev => [...prev.slice(-19), rollEntry]);
@@ -122,12 +118,10 @@ export default function Session() {
     }
   }, [campaignId, activeSession, user]);
 
-  // Short Rest: restore hit dice rolls worth of HP
   const doShortRest = async () => {
     setRestingId('short');
     try {
       const updates = await Promise.all(characters.map(async (c) => {
-        // Roll hit dice (1 die of character's hit die type)
         const dieMatch = (c.hit_dice_total || 'd8').match(/d(\d+)/);
         const dieSides = dieMatch ? parseInt(dieMatch[1]) : 8;
         const conMod = Math.floor(((c.ability_scores?.constitution || 10) - 10) / 2);
@@ -150,17 +144,13 @@ export default function Session() {
     finally { setRestingId(null); setRestDialog(null); }
   };
 
-  // Long Rest: full HP + all hit dice restored + spell slots
   const doLongRest = async () => {
     setRestingId('long');
     try {
       const updates = await Promise.all(characters.map(async (c) => {
-        const updates = {
-          hp_current: c.hp_max || 0,
-          hit_dice_current: c.hit_dice_total, // restore all hit dice
-        };
-        await base44.entities.Character.update(c.id, updates);
-        return { ...c, ...updates };
+        const upd = { hp_current: c.hp_max || 0, hit_dice_current: c.hit_dice_total };
+        await base44.entities.Character.update(c.id, upd);
+        return { ...c, ...upd };
       }));
       setCharacters(updates);
       if (activeSession?.id) {
@@ -175,7 +165,6 @@ export default function Session() {
     finally { setRestingId(null); setRestDialog(null); }
   };
 
-  // Most recent episode summary for AI context
   const sessionSummary = episodes.length > 0
     ? episodes.sort((a, b) => (b.episode_number || 0) - (a.episode_number || 0))[0]?.recap || ''
     : '';
@@ -202,7 +191,6 @@ export default function Session() {
     );
   }
 
-  // Shared AI panel props
   const aiProps = {
     campaign, campaignId,
     isDM, userId: user?.id, userName: user?.full_name || user?.display_name,
@@ -219,7 +207,6 @@ export default function Session() {
           <ArrowLeft className="h-4 w-4 mr-2" /> Back to Campaign
         </Button>
 
-        {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <div>
             <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -237,7 +224,6 @@ export default function Session() {
             <p className="text-slate-400 text-sm">{isDM ? 'Dungeon Master' : 'Player'} · {campaign.tone?.replace('_', ' ')}</p>
           </div>
 
-          {/* Rest buttons — DM only, active session only */}
           {isDM && activeSession && (
             <div className="flex gap-2">
               <Button size="sm" variant="outline" onClick={() => setRestDialog('short')}
@@ -252,7 +238,6 @@ export default function Session() {
           )}
         </div>
 
-        {/* Pre-session */}
         {!activeSession && (
           <SessionHome
             campaignId={campaignId}
@@ -262,7 +247,6 @@ export default function Session() {
           />
         )}
 
-        {/* Active session */}
         {activeSession && (
           <>
             <div className="flex items-center justify-between mb-3">
@@ -304,7 +288,6 @@ export default function Session() {
                 )}
               </TabsList>
 
-              {/* AI DM Tab */}
               {isAIMode && (
                 <TabsContent value="ai-dm" className="mt-4">
                   <div className="grid gap-4 lg:grid-cols-3" style={{ height: '600px' }}>
@@ -321,7 +304,6 @@ export default function Session() {
                 </TabsContent>
               )}
 
-              {/* Session Tab */}
               <TabsContent value="home" className="mt-4">
                 <div className="grid gap-6 lg:grid-cols-3">
                   <div className="lg:col-span-2 space-y-6">
@@ -393,7 +375,6 @@ export default function Session() {
                 </div>
               </TabsContent>
 
-              {/* Log Tab — with player message input */}
               <TabsContent value="log" className="mt-4">
                 <div className="grid gap-6 lg:grid-cols-3">
                   <div className="lg:col-span-2">
@@ -411,12 +392,10 @@ export default function Session() {
                 </div>
               </TabsContent>
 
-              {/* Quick Sheets */}
               <TabsContent value="sheets" className="mt-4">
                 <QuickSheets campaignId={campaignId} isDM={isDM} userId={user?.id} />
               </TabsContent>
 
-              {/* Dice */}
               <TabsContent value="dice" className="mt-4">
                 <div className="max-w-lg mx-auto">
                   <DiceRoller
@@ -427,7 +406,6 @@ export default function Session() {
                 </div>
               </TabsContent>
 
-              {/* Seren (DM Present only) */}
               {!isAIMode && (
                 <TabsContent value="scribe" className="mt-4">
                   <div className="max-w-2xl mx-auto" style={{ height: '580px' }}>
@@ -440,7 +418,6 @@ export default function Session() {
         )}
       </div>
 
-      {/* Rest Dialogs */}
       <AlertDialog open={restDialog === 'short'} onOpenChange={() => setRestDialog(null)}>
         <AlertDialogContent className="bg-slate-900 border-slate-700">
           <AlertDialogHeader>

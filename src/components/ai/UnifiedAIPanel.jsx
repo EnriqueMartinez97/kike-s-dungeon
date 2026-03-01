@@ -116,11 +116,11 @@ export default function UnifiedAIPanel({
   campaign, campaignId, sessionId,
   isDM, userId, userName,
   documents = [], npcs = [], quests = [], characters = [],
-  combatState = null,   // { active, round, combatants }
-  recentRolls = [],     // [{ formula, result, user_name }]
-  sessionSummary = '',  // previous session text
+  combatState = null,
+  recentRolls = [],
+  sessionSummary = '',
   isCollapsible = false,
-  mode = 'scribe',      // 'dm' | 'scribe'
+  mode = 'scribe',
 }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -230,7 +230,6 @@ export default function UnifiedAIPanel({
     } finally { setLoading(false); }
   }
 
-  // Collapsible collapsed state
   if (isCollapsible && collapsed) {
     return (
       <Card className={`bg-slate-900/50 ${borderCls}`}>
@@ -246,7 +245,6 @@ export default function UnifiedAIPanel({
     );
   }
 
-  // Onboarding screen
   if (onboardingMode && isAIDM) {
     return (
       <Card className={`bg-slate-900/50 ${borderCls} flex flex-col`} style={{ height: '520px' }}>
