@@ -324,9 +324,17 @@ export default function MyLibrary() {
       ) : (
         <div className="space-y-3">
           {filtered.map(doc => (
-            <Card key={doc.id} className="bg-slate-900/50 border-slate-800 hover:border-violet-500/40 transition-all">
+            <Card key={doc.id} className={`bg-slate-900/50 border-slate-800 hover:border-violet-500/40 transition-all ${bulkMode && selectedDocIds.includes(doc.id) ? 'border-violet-500/60 bg-violet-900/10' : ''}`}>
               <CardContent className="p-4">
                 <div className="flex items-start justify-between gap-4">
+                  {bulkMode && (
+                    <input
+                      type="checkbox"
+                      checked={selectedDocIds.includes(doc.id)}
+                      onChange={() => toggleSelectDoc(doc.id)}
+                      className="accent-violet-500 w-4 h-4 mt-1 flex-shrink-0 cursor-pointer"
+                    />
+                  )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
                       <h3 className="font-semibold text-white truncate">{doc.title}</h3>
