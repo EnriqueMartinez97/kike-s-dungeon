@@ -477,13 +477,11 @@ export default function Session() {
                 </div>
               </TabsContent>
 
-              {!isAIMode && (
-                <TabsContent value="scribe" className="mt-4">
-                  <div className="max-w-2xl mx-auto" style={{ height: '580px' }}>
-                    <UnifiedAIPanel {...aiProps} mode="scribe" />
-                  </div>
-                </TabsContent>
-              )}
+              <TabsContent value="scribe" className="mt-4">
+                <div className="max-w-2xl mx-auto" style={{ height: '580px' }}>
+                  <UnifiedAIPanel {...aiProps} mode="scribe" sessionId={activeSession.id} />
+                </div>
+              </TabsContent>
             </Tabs>
           </>
         )}
