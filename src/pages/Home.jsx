@@ -51,9 +51,9 @@ export default function Home() {
               <span>Now with AI Dungeon Master</span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white mb-8 tracking-tight leading-tight">
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white mb-8 tracking-tight leading-[1.2]">
               Welcome to
-              <span className="block bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent overflow-visible pb-2">
                 Kike's Dungeon
               </span>
             </h1>
