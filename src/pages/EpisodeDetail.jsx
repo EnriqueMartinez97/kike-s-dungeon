@@ -27,6 +27,8 @@ export default function EpisodeDetail() {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editData, setEditData] = useState({});
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
