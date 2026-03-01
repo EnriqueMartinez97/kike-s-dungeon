@@ -530,6 +530,15 @@ export default function UnifiedAIPanel({
           </div>
         )}
       </ScrollArea>
+      {showScrollBtn && (
+        <button
+          onClick={scrollToBottom}
+          className="absolute bottom-3 right-3 z-10 bg-slate-700 hover:bg-slate-600 text-white rounded-full w-7 h-7 flex items-center justify-center shadow-lg transition-all"
+        >
+          <ArrowDown className="h-3.5 w-3.5" />
+        </button>
+      )}
+      </div>
 
       <div className="p-3 border-t border-slate-800 flex-shrink-0">
         <div className="flex gap-2">
