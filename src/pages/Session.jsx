@@ -181,11 +181,20 @@ export default function Session() {
     finally { setRestingId(null); setRestDialog(null); }
   };
 
+  const lastEpisodeLogs = (() => {
+    const sorted = [...episodes].sort((a, b) => (b.episode_number || 0) - (a.episode_number || 0));
+    if (sorted.length === 0) return [];
+    return sorted[0]?.session_log || [];
+  })();
+
   const sessionSummary = (() => {
     const sorted = [...episodes].sort((a, b) => (b.episode_number || 0) - (a.episode_number || 0));
     if (sorted.length === 0) return '';
     const lastRecap = sorted[0]?.recap || '';
-    return lastRecap ? `**Last Session:** ${lastRecap}` : '';
+    const logSummary = lastEpisodeLogs.length > 0 
+      ? `\n\n**Session Log (for full context):**\n${lastEpisodeLogs.map(l => `[${l.type}] ${l.content}`).join('\n')}`
+      : '';
+    return lastRecap ? `**Last Session:** ${lastRecap}${logSummary}` : logSummary;
   })();
 
   const handleEndSession = async () => {
