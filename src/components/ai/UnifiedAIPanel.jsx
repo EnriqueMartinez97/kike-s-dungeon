@@ -160,12 +160,26 @@ export default function UnifiedAIPanel({
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, [messages]);
 
+  // Check if any previous AI DM messages exist for this campaign (not just this session)
+  const [checkedPriorHistory, setCheckedPriorHistory] = useState(false);
   useEffect(() => {
-    if (isAIDM && campaign?.long_campaign_mode && messages.length === 0 && !onboardingDone) {
-      setOnboardingMode(true);
-    }
-    // If already done (loaded from sessionStorage), don't re-show onboarding
-  }, [isAIDM, campaign, messages.length]);
+    if (!isAIDM || !campaignId || checkedPriorHistory) return;
+    setCheckedPriorHistory(true);
+    base44.entities.SessionLog.filter({ campaign_id: campaignId, entry_type: 'AI_DM_MESSAGE' })
+      .then(logs => {
+        if (logs.length > 0) {
+          // Prior sessions exist — skip onboarding forever for this campaign
+          setOnboardingDone(true);
+        } else if (campaign?.long_campaign_mode && messages.length === 0 && !onboardingDone) {
+          setOnboardingMode(true);
+        }
+      })
+      .catch(() => {
+        if (campaign?.long_campaign_mode && messages.length === 0 && !onboardingDone) {
+          setOnboardingMode(true);
+        }
+      });
+  }, [isAIDM, campaign, campaignId, checkedPriorHistory]);
 
   async function loadPersistedMessages() {
     try {
