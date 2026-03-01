@@ -363,7 +363,7 @@ export default function Session() {
                           combatLog={combatLog} setCombatLog={setCombatLog}
                         />
                       )}
-                      <QuickQuestPanel campaignId={campaignId} isDM={isDM} userId={user?.id} />
+                      <QuickQuestPanel campaignId={campaignId} quests={quests} setQuests={setQuests} isDM={isDM} userId={user?.id} userName={user?.full_name} />
                     </div>
                   </div>
                 </TabsContent>
