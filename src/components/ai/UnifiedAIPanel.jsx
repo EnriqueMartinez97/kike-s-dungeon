@@ -304,15 +304,18 @@ export default function UnifiedAIPanel({
   }
 
   if (onboardingMode && isAIDM) {
+    const activeQuestions = isRedoOnboarding ? REDO_QUESTIONS : ONBOARDING_QUESTIONS;
     return (
-      <Card className={`bg-slate-900/50 ${borderCls} flex flex-col`} style={{ height: aiDecideMode ? '400px' : '520px' }}>
+      <Card className={`bg-slate-900/50 ${borderCls} flex flex-col`} style={{ height: aiDecideMode ? '400px' : (isRedoOnboarding ? '380px' : '520px') }}>
         <CardHeader className="border-b border-slate-800 flex-shrink-0">
           <CardTitle className="text-white flex items-center gap-2">
             <Crown className="h-5 w-5 text-violet-400" />
-            {aiDecideMode ? 'What do you want?' : 'Session Setup'}
+            {aiDecideMode ? 'What do you want?' : isRedoOnboarding ? 'Adjust Session Tone' : 'Session Setup'}
           </CardTitle>
           <p className="text-xs text-slate-400">
-            {aiDecideMode ? 'Tell the AI DM what you\'re in the mood for and it will craft the session.' : 'Help the AI DM prepare for your session'}
+            {aiDecideMode ? 'Tell the AI DM what you\'re in the mood for and it will craft the session.'
+              : isRedoOnboarding ? 'Adjust tone & goals — story continuity will be preserved.'
+              : 'Help the AI DM prepare for your session'}
           </p>
         </CardHeader>
 
