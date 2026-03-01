@@ -408,6 +408,12 @@ export default function CampaignDetail() {
             <Users className="h-4 w-4 mr-2" />
             Members
           </TabsTrigger>
+          {isDM && (
+            <TabsTrigger value="session-history" className="data-[state=active]:bg-violet-600">
+              <History className="h-4 w-4 mr-2" />
+              Session History
+            </TabsTrigger>
+          )}
         </TabsList>
 
         <TabsContent value="characters">
