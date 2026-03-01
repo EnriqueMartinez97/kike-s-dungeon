@@ -545,6 +545,39 @@ export default function MyLibrary() {
         </DialogContent>
       </Dialog>
 
+      {/* Bulk Link Dialog */}
+      <Dialog open={bulkLinkOpen} onOpenChange={() => setBulkLinkOpen(false)}>
+        <DialogContent className="bg-slate-900 border-slate-700">
+          <DialogHeader>
+            <DialogTitle className="text-white">Link {selectedDocIds.length} Document{selectedDocIds.length !== 1 ? 's' : ''} to Campaigns</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <p className="text-slate-400 text-sm">Select campaigns to link the selected documents to. Existing links will be preserved.</p>
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {campaigns.length === 0 && <p className="text-slate-500 text-sm">No campaigns found.</p>}
+              {campaigns.map(c => (
+                <label key={c.id} className="flex items-center gap-3 p-3 rounded-lg bg-slate-800 cursor-pointer hover:bg-slate-700 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={bulkCampaignIds.includes(c.id)}
+                    onChange={() => setBulkCampaignIds(prev => prev.includes(c.id) ? prev.filter(x => x !== c.id) : [...prev, c.id])}
+                    className="accent-violet-500"
+                  />
+                  <span className="text-white text-sm">{c.name}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setBulkLinkOpen(false)} className="text-slate-400">Cancel</Button>
+            <Button onClick={saveBulkLink} disabled={bulkSaving || bulkCampaignIds.length === 0} className="bg-violet-600 hover:bg-violet-700">
+              <Link className="h-4 w-4 mr-2" />
+              {bulkSaving ? 'Linking...' : 'Link Documents'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Delete Confirm */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent className="bg-slate-900 border-slate-700">
