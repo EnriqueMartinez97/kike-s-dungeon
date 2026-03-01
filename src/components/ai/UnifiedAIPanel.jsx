@@ -148,18 +148,11 @@ export default function UnifiedAIPanel({
   const aiAvatarBg = isAIDM ? 'bg-violet-700' : 'bg-amber-700';
   const borderCls = isAIDM ? 'border-violet-500/20' : 'border-amber-500/20';
 
+  const entryType = isAIDM ? 'AI_DM_MESSAGE' : 'SEREN_SCRIBE_MESSAGE';
+
   useEffect(() => {
-    if (isAIDM && sessionId) {
+    if (sessionId) {
       loadPersistedMessages();
-      const unsub = base44.entities.SessionLog.subscribe(event => {
-        if (event.data?.campaign_id !== campaignId || event.data?.entry_type !== 'AI_DM_MESSAGE') return;
-        if (event.type === 'create' && !event.data.metadata?.is_user_message) {
-          setMessages(prev => prev.find(m => m.id === event.data.id) ? prev : [
-            ...prev, { id: event.data.id, role: 'assistant', content: event.data.content, timestamp: event.data.created_date }
-          ]);
-        }
-      });
-      return unsub;
     }
   }, [campaignId, sessionId, isAIDM]);
 
