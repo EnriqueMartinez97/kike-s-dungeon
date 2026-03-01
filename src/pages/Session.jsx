@@ -187,42 +187,45 @@ export default function Session() {
       const allEpisodes = await base44.entities.Episode.filter({ campaign_id: campaignId });
       const nextEpisodeNum = (allEpisodes.length > 0 ? Math.max(...allEpisodes.map(e => e.episode_number || 0)) : 0) + 1;
       const today = new Date().toISOString().split('T')[0];
+      const sessionIdToClose = activeSession.id;
 
-      let aiRecap = episodeRecap;
-      if (!aiRecap) {
-        const logs = await base44.entities.SessionLog.filter({ campaign_id: campaignId, session_id: activeSession.id });
-        const logText = logs
-          .filter(l => l.entry_type !== 'AI_DM_MESSAGE')
-          .map(l => `[${l.entry_type}] ${l.user_name || 'Unknown'}: ${l.content}`)
-          .join('\n');
-        if (logText.trim()) {
-          aiRecap = await base44.integrations.Core.InvokeLLM({
-            prompt: `You are a skilled narrator summarizing a D&D 5e session. Based on the following session log, write a concise, engaging episode recap in 2-4 paragraphs, written in past tense as a chronicle entry. Focus on key story beats, character moments, and significant decisions. Campaign: "${campaign?.name}". Session log:\n\n${logText.slice(0, 3000)}`,
-            add_context_from_internet: false
-          });
-        }
-      }
-
-      await base44.entities.Episode.create({
+      const createdEpisode = await base44.entities.Episode.create({
         campaign_id: campaignId,
         episode_number: nextEpisodeNum,
         name: episodeTitle || `Episode ${nextEpisodeNum}`,
         date: today,
         status: 'completed',
-        recap: aiRecap || '',
+        recap: episodeRecap || '',
         participant_ids: [],
       });
-      await base44.entities.ActiveSession.update(activeSession.id, { status: 'closed' });
+      await base44.entities.ActiveSession.update(sessionIdToClose, { status: 'closed' });
 
       setActiveSession(null);
       setEndSessionDialog(false);
       setEpisodeTitle('');
       setEpisodeRecap('');
-      loadData();
+      setClosingSession(false);
       navigate(createPageUrl(`CampaignDetail?id=${campaignId}`));
+
+      // Generate AI recap in background
+      if (!episodeRecap) {
+        base44.entities.SessionLog.filter({ campaign_id: campaignId, session_id: sessionIdToClose })
+          .then(logs => {
+            const logText = logs
+              .filter(l => l.entry_type !== 'AI_DM_MESSAGE' && l.entry_type !== 'SEREN_SCRIBE_MESSAGE')
+              .map(l => `[${l.entry_type}] ${l.user_name || 'Unknown'}: ${l.content}`)
+              .join('\n');
+            if (!logText.trim()) return null;
+            return base44.integrations.Core.InvokeLLM({
+              prompt: `You are a skilled narrator summarizing a D&D 5e session. Based on the following session log, write a concise, engaging episode recap in 2-4 paragraphs, written in past tense as a chronicle entry. Campaign: "${campaign?.name}". Session log:\n\n${logText.slice(0, 3000)}`,
+              add_context_from_internet: false
+            });
+          })
+          .then(aiRecap => { if (aiRecap) base44.entities.Episode.update(createdEpisode.id, { recap: aiRecap }); })
+          .catch(e => console.error('AI recap failed (non-blocking):', e));
+      }
     } catch (err) {
       console.error('Error closing session:', err);
-    } finally {
       setClosingSession(false);
     }
   };
