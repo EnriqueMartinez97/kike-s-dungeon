@@ -390,10 +390,20 @@ export default function UnifiedAIPanel({
             {combatState?.active && <Badge className="bg-red-500/20 text-red-300 border border-red-500/30 text-xs">⚔ Combat R{combatState.round}</Badge>}
           </CardTitle>
           <div className="flex gap-1">
+            {isAIDM && messages.length > 0 && (
+              <Button size="sm" variant="ghost" onClick={() => {
+                setIsRedoOnboarding(true);
+                setOnboardingAnswers({});
+                setAiDecideMode(false);
+                setOnboardingMode(true);
+              }} className="text-violet-400 h-7 px-2 text-xs" title="Redo session setup">
+                <RefreshCw className="h-3 w-3 mr-1" /> Redo Setup
+              </Button>
+            )}
             {messages.length > 0 && (
               <Button size="sm" variant="ghost" onClick={async () => {
                 setMessages([]);
-                if (isAIDM) { setOnboardingDone(false); setOnboardingMode(true); }
+                if (isAIDM) { setIsRedoOnboarding(false); setOnboardingDone(false); setOnboardingMode(true); }
               }} className="text-slate-500 h-7 px-2 text-xs">Clear</Button>
             )}
             {isCollapsible && (
