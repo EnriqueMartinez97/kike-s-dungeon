@@ -218,6 +218,22 @@ export default function UnifiedAIPanel({
     finally { setLoading(false); }
   }
 
+  async function completeAiDecide() {
+    if (!aiDecideInput.trim()) return;
+    setOnboardingMode(false);
+    setAiDecideMode(false);
+    setOnboardingDone(true);
+    setLoading(true);
+    try {
+      const prompt = `${getSystemPrompt()}\n\nThe players have expressed what they want for this session: "${aiDecideInput}"\n\nAs the AI DM, choose the perfect session setup based on their wishes and the campaign context. Then open the session with an atmospheric, immersive scene. Use second-person narration. End with an invitation for player action.`;
+      const response = await base44.integrations.Core.InvokeLLM({ prompt, add_context_from_internet: false });
+      const msg = { id: Date.now(), role: 'assistant', content: response, timestamp: new Date().toISOString() };
+      setMessages([msg]);
+      await persistMessage(response, false);
+    } catch (e) { console.error('AI decide failed', e); }
+    finally { setLoading(false); }
+  }
+
   async function sendMessage() {
     if (!input.trim() || loading) return;
     const text = input.trim();
