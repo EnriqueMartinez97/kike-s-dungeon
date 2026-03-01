@@ -69,6 +69,12 @@ export default function EpisodeDetail() {
 
   const isDM = membership?.role === 'dm' || membership?.role === 'co_dm';
 
+  const handleDelete = async () => {
+    setDeleting(true);
+    await base44.entities.Episode.delete(episode.id);
+    navigate(createPageUrl(`CampaignDetail?id=${episode.campaign_id}`));
+  };
+
   const startEditing = () => {
     setEditData({
       name: episode.name,
