@@ -13,8 +13,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-export default function SessionHome({ campaignId, isDM, onStartSession, onCloseSession, onRequestClose }) {
-  // Allow parent to trigger close dialog
+export default function SessionHome({ campaignId, isDM, onStartSession, onCloseSession, onRequestClose, activeSession: activeSessionProp }) {
   useEffect(() => {
     if (onRequestClose) onRequestClose(() => setShowCloseDialog(true));
   }, [onRequestClose]);
