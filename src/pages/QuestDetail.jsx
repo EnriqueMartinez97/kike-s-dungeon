@@ -27,6 +27,7 @@ export default function QuestDetail() {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editData, setEditData] = useState({});
+  const [deleteDialog, setDeleteDialog] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
