@@ -74,8 +74,8 @@ export default function CombatTracker({
   }, [onCombatStateChange]);
 
   const addLog = (actor, action, details = '') => {
-    setCombatLog(prev => [...prev, {
-      id: Date.now(), timestamp: new Date().toISOString(), round, actor, action, details
+    _setCombatLog(prev => [...prev, {
+      id: Date.now(), timestamp: new Date().toISOString(), round: _round, actor, action, details
     }]);
   };
 
@@ -83,31 +83,31 @@ export default function CombatTracker({
 
   const startCombatWithCombatants = (initial) => {
     const sorted = sortByInitiative(initial);
-    setCombatants(sorted);
-    setCombatActive(true);
-    setRound(1);
-    setCurrentTurnIndex(0);
-    setCombatLog([]);
-    addLog('System', `Combat started — ${sorted.map(c => `${c.name}(${c.initiative})`).join(', ')}`);
+    _setCombatants(sorted);
+    _setCombatActive(true);
+    _setRound(1);
+    _setCurrentTurnIndex(0);
+    _setCombatLog([]);
+    setTimeout(() => addLog('System', `Combat started — ${sorted.map(c => `${c.name}(${c.initiative})`).join(', ')}`), 0);
     notifyStateChange(sorted, true, 1);
   };
 
   const nextTurn = () => {
-    let nextIdx = currentTurnIndex + 1;
-    let nextRound = round;
-    if (nextIdx >= combatants.length) {
+    let nextIdx = _currentTurnIndex + 1;
+    let nextRound = _round;
+    if (nextIdx >= _combatants.length) {
       nextIdx = 0;
-      nextRound = round + 1;
-      setRound(nextRound);
+      nextRound = _round + 1;
+      _setRound(nextRound);
       addLog('System', `Round ${nextRound} begins`);
     }
-    setCurrentTurnIndex(nextIdx);
-    addLog('System', `${combatants[nextIdx]?.name}'s turn`);
+    _setCurrentTurnIndex(nextIdx);
+    addLog('System', `${_combatants[nextIdx]?.name}'s turn`);
   };
 
   const updateCombatants = (updated) => {
-    setCombatants(updated);
-    notifyStateChange(updated, combatActive, round);
+    _setCombatants(updated);
+    notifyStateChange(updated, _combatActive, _round);
   };
 
   const applyAction = async () => {
