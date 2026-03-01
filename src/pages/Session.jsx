@@ -297,19 +297,6 @@ export default function Session() {
             onCloseSession={() => { setActiveSession(null); loadData(); navigate(createPageUrl(`CampaignDetail?id=${campaignId}`)); }}
           />
         )}
-        {/* Hidden mount to allow End Session button to trigger episode creation dialog */}
-        {activeSession && (
-          <div className="hidden">
-            <SessionHome
-              campaignId={campaignId}
-              isDM={isDM}
-              activeSession={activeSession}
-              onStartSession={() => {}}
-              onCloseSession={() => { setActiveSession(null); loadData(); navigate(createPageUrl(`CampaignDetail?id=${campaignId}`)); }}
-              onRequestClose={fn => setTriggerEndSession(() => fn)}
-            />
-          </div>
-        )}
 
         {activeSession && (
           <>
