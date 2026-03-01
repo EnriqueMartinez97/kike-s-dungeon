@@ -253,7 +253,7 @@ export default function CombatTracker({
           <div className="flex items-center justify-between">
             <CardTitle className="text-white text-sm flex items-center gap-2">
               <Swords className="h-4 w-4 text-red-400 animate-pulse" />
-              Combat — Round {round}
+              Combat — Round {_round}
             </CardTitle>
             <div className="flex gap-1">
               <Button size="sm" variant="ghost" onClick={() => setShowAddCombatant(true)} className="text-slate-400 h-7 px-2">
