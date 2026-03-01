@@ -42,7 +42,35 @@ export default function QuickSheets({ campaignId, isDM, userId }) {
 
   useEffect(() => {
     loadData();
-  }, [campaignId]);
+
+    // Real-time subscriptions
+    const unsubChar = base44.entities.Character.subscribe((event) => {
+      if (!event.data?.campaign_ids?.includes(campaignId) && event.data?.campaign_id !== campaignId) return;
+      if (event.type === 'update') {
+        setCharacters(prev => prev.map(c => c.id === event.id ? { ...c, ...event.data } : c));
+      } else if (event.type === 'create') {
+        setCharacters(prev => prev.find(c => c.id === event.id) ? prev : [...prev, event.data]);
+      } else if (event.type === 'delete') {
+        setCharacters(prev => prev.filter(c => c.id !== event.id));
+      }
+    });
+
+    const unsubNPC = isDM ? base44.entities.NPC.subscribe((event) => {
+      if (!event.data?.campaign_ids?.includes(campaignId) && event.data?.campaign_id !== campaignId) return;
+      if (event.type === 'update') {
+        setNpcs(prev => prev.map(n => n.id === event.id ? { ...n, ...event.data } : n));
+      } else if (event.type === 'create') {
+        setNpcs(prev => prev.find(n => n.id === event.id) ? prev : [...prev, event.data]);
+      } else if (event.type === 'delete') {
+        setNpcs(prev => prev.filter(n => n.id !== event.id));
+      }
+    }) : null;
+
+    return () => {
+      unsubChar();
+      if (unsubNPC) unsubNPC();
+    };
+  }, [campaignId, isDM]);
 
   const loadData = async () => {
     setLoading(true);
