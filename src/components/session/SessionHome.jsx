@@ -222,13 +222,13 @@ export default function SessionHome({ campaignId, isDM, onStartSession, onCloseS
             <AlertDialogCancel className="bg-slate-800 border-slate-700 text-white hover:bg-slate-700">
               Keep Open
             </AlertDialogCancel>
-            <AlertDialogAction
+            <Button
               onClick={handleCloseSession}
               disabled={closing}
               className="bg-red-600 hover:bg-red-700"
             >
               {closing ? 'Generating Episode...' : 'Close & Save'}
-            </AlertDialogAction>
+            </Button>
           </div>
         </AlertDialogContent>
       </AlertDialog>
