@@ -359,7 +359,7 @@ export default function UnifiedAIPanel({
           </CardTitle>
           <div className="flex gap-1">
             {messages.length > 0 && (
-              <Button size="sm" variant="ghost" onClick={() => { setMessages([]); setOnboardingDone(false); }} className="text-slate-500 h-7 px-2 text-xs">Clear</Button>
+              <Button size="sm" variant="ghost" onClick={() => { setMessages([]); setOnboardingDone(false); setOnboardingMode(true); }} className="text-slate-500 h-7 px-2 text-xs">Clear</Button>
             )}
             {isCollapsible && (
               <Button size="sm" variant="ghost" onClick={() => setCollapsed(true)} className="text-slate-400 h-7 w-7 p-0">
