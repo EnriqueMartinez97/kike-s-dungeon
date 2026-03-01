@@ -269,8 +269,8 @@ export default function CombatTracker({
         <CardContent className="p-2">
           <ScrollArea className="max-h-[400px]">
             <div className="space-y-1">
-              {combatants.map((c, idx) => {
-                const isCurrent = idx === currentTurnIndex;
+              {_combatants.map((c, idx) => {
+                const isCurrent = idx === _currentTurnIndex;
                 const hpPct = Math.max(0, Math.min(100, (c.hp / (c.max_hp || 1)) * 100));
                 return (
                   <div key={c.id} className={`p-2 rounded-lg border transition-all ${
