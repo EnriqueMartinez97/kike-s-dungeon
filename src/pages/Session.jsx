@@ -376,7 +376,13 @@ export default function Session() {
                         <h2 className="text-lg font-bold text-white flex items-center gap-2">
                           <Swords className="h-5 w-5 text-red-400" /> Combat Tracker
                         </h2>
-                        <CombatTracker characters={characters} npcs={npcs} isDM={isDM} campaignId={campaignId} onCombatStateChange={handleCombatStateChange} />
+                        <CombatTracker characters={characters} npcs={npcs} isDM={isDM} campaignId={campaignId} onCombatStateChange={handleCombatStateChange}
+                          combatActive={combatActive} setCombatActive={setCombatActive}
+                          round={combatRound} setRound={setCombatRound}
+                          currentTurnIndex={combatTurnIndex} setCurrentTurnIndex={setCombatTurnIndex}
+                          combatants={combatants} setCombatants={setCombatants}
+                          combatLog={combatLog} setCombatLog={setCombatLog}
+                        />
                       </>
                     )}
 
