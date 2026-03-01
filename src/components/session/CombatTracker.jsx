@@ -36,12 +36,31 @@ export default function CombatTracker({
   isDM,
   campaignId,
   onCombatStateChange,
+  // Lifted state props (from parent to survive tab switches)
+  combatActive, setCombatActive,
+  round, setRound,
+  currentTurnIndex, setCurrentTurnIndex,
+  combatants, setCombatants,
+  combatLog, setCombatLog,
 }) {
-  const [combatActive, setCombatActive] = useState(false);
-  const [round, setRound] = useState(1);
-  const [currentTurnIndex, setCurrentTurnIndex] = useState(0);
-  const [combatants, setCombatants] = useState([]);
-  const [combatLog, setCombatLog] = useState([]);
+  // Fallback to local state if props not provided (backward compat)
+  const [localCombatActive, setLocalCombatActive] = useState(false);
+  const [localRound, setLocalRound] = useState(1);
+  const [localTurnIndex, setLocalTurnIndex] = useState(0);
+  const [localCombatants, setLocalCombatants] = useState([]);
+  const [localCombatLog, setLocalCombatLog] = useState([]);
+
+  const isLifted = combatActive !== undefined;
+  const _combatActive = isLifted ? combatActive : localCombatActive;
+  const _setCombatActive = isLifted ? setCombatActive : setLocalCombatActive;
+  const _round = isLifted ? round : localRound;
+  const _setRound = isLifted ? setRound : setLocalRound;
+  const _currentTurnIndex = isLifted ? currentTurnIndex : localTurnIndex;
+  const _setCurrentTurnIndex = isLifted ? setCurrentTurnIndex : setLocalTurnIndex;
+  const _combatants = isLifted ? combatants : localCombatants;
+  const _setCombatants = isLifted ? setCombatants : setLocalCombatants;
+  const _combatLog = isLifted ? combatLog : localCombatLog;
+  const _setCombatLog = isLifted ? setCombatLog : setLocalCombatLog;
   const [showInitiativeDialog, setShowInitiativeDialog] = useState(false);
   const [showAddCombatant, setShowAddCombatant] = useState(false);
   const [showActionDialog, setShowActionDialog] = useState(null);
