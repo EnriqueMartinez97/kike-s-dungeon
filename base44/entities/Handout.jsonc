@@ -1,0 +1,44 @@
+{
+  "name": "Handout",
+  "type": "object",
+  "properties": {
+    "campaign_id": {
+      "type": "string"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "dm_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string",
+      "description": "Text content or description"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "Optional image URL"
+    },
+    "recipient_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Empty = all players"
+    },
+    "dismissed_by": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "User IDs who have dismissed this handout"
+    }
+  },
+  "required": [
+    "campaign_id",
+    "title"
+  ]
+}

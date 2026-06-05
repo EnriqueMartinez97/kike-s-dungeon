@@ -1,0 +1,64 @@
+{
+  "name": "GroupRollRequest",
+  "type": "object",
+  "properties": {
+    "campaign_id": {
+      "type": "string"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "dm_id": {
+      "type": "string"
+    },
+    "roll_type": {
+      "type": "string",
+      "description": "e.g. Perception, Stealth, Initiative, Custom"
+    },
+    "formula": {
+      "type": "string",
+      "description": "e.g. d20+3"
+    },
+    "description": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "closed"
+      ],
+      "default": "open"
+    },
+    "responses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string"
+          },
+          "user_name": {
+            "type": "string"
+          },
+          "character_name": {
+            "type": "string"
+          },
+          "roll": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "formula": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "campaign_id",
+    "roll_type"
+  ]
+}

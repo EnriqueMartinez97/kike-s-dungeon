@@ -25,6 +25,8 @@ import NotesPanel from '@/components/session/NotesPanel';
 import SessionHome from '@/components/session/SessionHome';
 import SessionLog from '@/components/session/SessionLog';
 import QuickSheets from '@/components/session/QuickSheets';
+import HandoutPanel from '@/components/session/HandoutPanel';
+import GroupRollPanel from '@/components/session/GroupRollPanel';
 
 export default function Session() {
   const [user, setUser] = useState(null);
@@ -395,6 +397,13 @@ export default function Session() {
               <TabsContent value="home" className="mt-4">
                 <div className="grid gap-6 lg:grid-cols-3">
                   <div className="lg:col-span-2 space-y-6">
+                    {/* Player: active handouts + group roll banners */}
+                    {!isDM && (
+                      <div className="space-y-2">
+                        <HandoutPanel campaignId={campaignId} sessionId={activeSession?.id} isDM={false} userId={user?.id} userName={user?.full_name} />
+                        <GroupRollPanel campaignId={campaignId} sessionId={activeSession?.id} isDM={false} userId={user?.id} userName={user?.full_name || user?.display_name} characters={characters} />
+                      </div>
+                    )}
                     {isDM && (
                       <>
                         <h2 className="text-lg font-bold text-white flex items-center gap-2">
@@ -461,6 +470,12 @@ export default function Session() {
                   </div>
 
                   <div className="space-y-6">
+                    {isDM && (
+                      <>
+                        <HandoutPanel campaignId={campaignId} sessionId={activeSession?.id} isDM={true} userId={user?.id} userName={user?.full_name} />
+                        <GroupRollPanel campaignId={campaignId} sessionId={activeSession?.id} isDM={true} userId={user?.id} userName={user?.full_name} characters={characters} />
+                      </>
+                    )}
                     <div>
                       <h2 className="text-sm font-bold text-white mb-3">Session Notes</h2>
                       <NotesPanel campaignId={campaignId} episodeId={activeSession?.id} isDM={isDM} user={user}
