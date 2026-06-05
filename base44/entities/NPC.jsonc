@@ -1,0 +1,116 @@
+{
+  "name": "NPC",
+  "type": "object",
+  "properties": {
+    "campaign_id": {
+      "type": "string",
+      "description": "Primary campaign (legacy, kept for backward compat)"
+    },
+    "campaign_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "All campaigns this NPC is attached to"
+    },
+    "owner_id": {
+      "type": "string",
+      "description": "User who created this NPC"
+    },
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "faction": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "stat_block": {
+      "type": "object",
+      "properties": {
+        "ac": {
+          "type": "number"
+        },
+        "hp": {
+          "type": "number"
+        },
+        "speed": {
+          "type": "string"
+        },
+        "str": {
+          "type": "number"
+        },
+        "dex": {
+          "type": "number"
+        },
+        "con": {
+          "type": "number"
+        },
+        "int": {
+          "type": "number"
+        },
+        "wis": {
+          "type": "number"
+        },
+        "cha": {
+          "type": "number"
+        },
+        "skills": {
+          "type": "string"
+        },
+        "senses": {
+          "type": "string"
+        },
+        "languages": {
+          "type": "string"
+        },
+        "cr": {
+          "type": "string"
+        },
+        "abilities": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "notes": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "portrait_url": {
+      "type": "string"
+    },
+    "linked_episode_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "linked_quest_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

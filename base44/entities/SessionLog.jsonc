@@ -1,0 +1,118 @@
+{
+  "name": "SessionLog",
+  "type": "object",
+  "properties": {
+    "campaign_id": {
+      "type": "string"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "episode_id": {
+      "type": "string"
+    },
+    "entry_type": {
+      "type": "string",
+      "enum": [
+        "ROLL",
+        "DAMAGE",
+        "HEAL",
+        "STATUS_CHANGE",
+        "DM_MESSAGE",
+        "PRIVATE_MESSAGE",
+        "NOTE",
+        "INITIATIVE",
+        "COMBAT_START",
+        "COMBAT_END",
+        "AI_DM_MESSAGE",
+        "SEREN_SCRIBE_MESSAGE",
+        "QUEST_UPDATE"
+      ],
+      "description": "Type of log entry"
+    },
+    "user_id": {
+      "type": "string"
+    },
+    "user_name": {
+      "type": "string"
+    },
+    "character_id": {
+      "type": "string"
+    },
+    "character_name": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string",
+      "description": "Main content/message"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "roll_formula": {
+          "type": "string"
+        },
+        "roll_result": {
+          "type": "number"
+        },
+        "damage_amount": {
+          "type": "number"
+        },
+        "damage_type": {
+          "type": "string"
+        },
+        "target_name": {
+          "type": "string"
+        },
+        "target_id": {
+          "type": "string"
+        },
+        "before_value": {
+          "type": "number"
+        },
+        "after_value": {
+          "type": "number"
+        },
+        "field_changed": {
+          "type": "string"
+        },
+        "initiative_roll": {
+          "type": "number"
+        },
+        "is_public": {
+          "type": "boolean"
+        },
+        "dm_edited": {
+          "type": "boolean"
+        },
+        "original_content": {
+          "type": "string"
+        },
+        "is_user_message": {
+          "type": "boolean"
+        },
+        "summoned": {
+          "type": "boolean"
+        },
+        "ai_generated": {
+          "type": "boolean"
+        }
+      },
+      "description": "Event-specific metadata"
+    },
+    "visibility": {
+      "type": "string",
+      "enum": [
+        "public",
+        "dm_only",
+        "private"
+      ],
+      "default": "public"
+    }
+  },
+  "required": [
+    "campaign_id",
+    "entry_type",
+    "content"
+  ]
+}

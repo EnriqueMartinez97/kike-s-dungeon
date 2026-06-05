@@ -1,0 +1,30 @@
+{
+  "name": "CampaignMembership",
+  "type": "object",
+  "properties": {
+    "campaign_id": {
+      "type": "string"
+    },
+    "user_id": {
+      "type": "string"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "dm",
+        "co_dm",
+        "player"
+      ],
+      "default": "player"
+    },
+    "joined_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "campaign_id",
+    "user_id",
+    "role"
+  ]
+}

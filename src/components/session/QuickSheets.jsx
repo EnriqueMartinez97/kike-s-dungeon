@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Plus, Minus, Heart, Shield, Backpack, TrendingUp, Settings, Trash2, X } from 'lucide-react';
+import { Plus, Minus, Heart, Shield, Backpack, TrendingUp, Settings, Trash2, X, Dice6 } from 'lucide-react';
+import SpellSlotTracker from '@/components/character/SpellSlotTracker';
+import ClassResourceTracker from '@/components/character/ClassResourceTracker';
 import { logDamage, logHeal, logStatusChange } from './sessionLogHelper';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -313,22 +315,33 @@ export default function QuickSheets({ campaignId, isDM, userId }) {
     );
   };
 
+  const handleResourceUpdate = (updatedChar) => {
+    setCharacters(prev => prev.map(c => c.id === updatedChar.id ? updatedChar : c));
+  };
+
   const CharacterDetailView = ({ character, onClose }) => {
     if (!character) return null;
 
     const abilities = character.ability_scores || {};
     const inventory = character.inventory || [];
+    const profBonus = Math.floor(((character.level || 1) - 1) / 4) + 2;
+
+    const rollSkill = (label, mod) => {
+      const d20 = Math.floor(Math.random() * 20) + 1;
+      alert(`${label}: d20(${d20}) + ${mod} = ${d20 + mod}`);
+    };
 
     return (
       <Dialog open={!!character} onOpenChange={onClose}>
-        <DialogContent className="bg-slate-900 border-slate-800 max-w-2xl max-h-96 flex flex-col">
+        <DialogContent className="bg-slate-900 border-slate-800 max-w-2xl max-h-[80vh] flex flex-col">
           <DialogHeader>
-            <DialogTitle className="text-white">{character.name} - Level {character.level || 1}</DialogTitle>
+            <DialogTitle className="text-white">{character.name} - Level {character.level || 1} {character.class || ''}</DialogTitle>
           </DialogHeader>
 
           <Tabs defaultValue="stats" className="flex-1">
-            <TabsList className="bg-slate-800 border border-slate-700 w-full justify-start">
+            <TabsList className="bg-slate-800 border border-slate-700 w-full justify-start flex-wrap">
               <TabsTrigger value="stats" className="text-xs">Stats</TabsTrigger>
+              <TabsTrigger value="resources" className="text-xs">Resources</TabsTrigger>
               <TabsTrigger value="inventory" className="text-xs">Inventory</TabsTrigger>
               <TabsTrigger value="level" className="text-xs">Level Up</TabsTrigger>
             </TabsList>
@@ -365,6 +378,54 @@ export default function QuickSheets({ campaignId, isDM, userId }) {
                       <p className="text-sm text-white">{character.speed || 30} ft</p>
                     </div>
                   </div>
+                </TabsContent>
+
+                {/* Resources Tab */}
+                <TabsContent value="resources" className="space-y-4 p-1">
+                  <ClassResourceTracker
+                    character={character}
+                    onUpdate={handleResourceUpdate}
+                  />
+                  <div className="border-t border-slate-800 pt-3">
+                    <SpellSlotTracker
+                      character={character}
+                      onUpdate={handleResourceUpdate}
+                    />
+                  </div>
+                  {/* Quick attack rolls */}
+                  {(character.attacks || []).length > 0 && (
+                    <div className="border-t border-slate-800 pt-3">
+                      <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">Attack Rolls</p>
+                      <div className="space-y-1">
+                        {character.attacks.map((atk, i) => {
+                          const bonus = atk.attack_bonus || 0;
+                          return (
+                            <button
+                              key={i}
+                              onClick={() => {
+                                const d20 = Math.floor(Math.random() * 20) + 1;
+                                const total = d20 + bonus;
+                                const isCrit = d20 === 20;
+                                const msg = `${atk.name}: ${d20}${bonus >= 0 ? '+' : ''}${bonus} = ${total}${isCrit ? ' ⭐ CRIT!' : ''}`;
+                                // Simple toast-style alert
+                                const el = document.createElement('div');
+                                el.textContent = msg;
+                                el.style.cssText = 'position:fixed;top:16px;right:16px;z-index:9999;background:#7c3aed;color:white;padding:8px 16px;border-radius:8px;font-size:14px;font-weight:bold';
+                                document.body.appendChild(el);
+                                setTimeout(() => el.remove(), 2500);
+                              }}
+                              className="w-full flex items-center justify-between px-3 py-2 rounded bg-slate-800 hover:bg-violet-500/20 border border-transparent hover:border-violet-500/30 transition-all text-xs"
+                            >
+                              <span className="text-slate-300">{atk.name} <span className="text-slate-500">{atk.damage && `(${atk.damage})`}</span></span>
+                              <span className="flex items-center gap-1 text-violet-400 font-semibold">
+                                {bonus >= 0 ? `+${bonus}` : bonus} <Dice6 className="h-3 w-3" />
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </TabsContent>
 
                 {/* Inventory Tab */}

@@ -1,0 +1,114 @@
+{
+  "name": "Campaign",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Campaign name"
+    },
+    "description": {
+      "type": "string",
+      "description": "Campaign description"
+    },
+    "cover_image": {
+      "type": "string",
+      "description": "URL to cover image"
+    },
+    "system": {
+      "type": "string",
+      "default": "DnD 5e",
+      "description": "Game system"
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "dm_present",
+        "dm_absent"
+      ],
+      "default": "dm_present",
+      "description": "DM is in the house or out of office"
+    },
+    "tone": {
+      "type": "string",
+      "enum": [
+        "grimdark",
+        "heroic_fantasy",
+        "mystery",
+        "political_intrigue"
+      ],
+      "description": "Campaign tone preset"
+    },
+    "tone_description": {
+      "type": "string",
+      "description": "Custom tone description written by DM (used to pick tone via AI)"
+    },
+    "long_campaign_mode": {
+      "type": "boolean",
+      "default": false,
+      "description": "When enabled, AI DM conducts an onboarding interview and narrates with rich detail"
+    },
+    "dm_id": {
+      "type": "string",
+      "description": "User ID of the DM"
+    },
+    "co_dm_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "User IDs of co-DMs"
+    },
+    "player_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "User IDs of players"
+    },
+    "campaign_state": {
+      "type": "object",
+      "properties": {
+        "location": {
+          "type": "string"
+        },
+        "active_quests": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "npc_present": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "unresolved_threads": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "timeline_notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "party_status_summary": {
+          "type": "string"
+        }
+      },
+      "description": "Structured campaign state for AI"
+    },
+    "invite_code": {
+      "type": "string",
+      "description": "Unique code for joining campaign"
+    }
+  },
+  "required": [
+    "name",
+    "tone",
+    "dm_id"
+  ]
+}

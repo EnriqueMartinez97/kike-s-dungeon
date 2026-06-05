@@ -1,0 +1,337 @@
+{
+  "name": "Character",
+  "type": "object",
+  "properties": {
+    "campaign_id": {
+      "type": "string",
+      "description": "Primary campaign (legacy, kept for backward compat)"
+    },
+    "campaign_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "All campaigns this character is attached to"
+    },
+    "owner_id": {
+      "type": "string",
+      "description": "User who owns this character"
+    },
+    "name": {
+      "type": "string"
+    },
+    "race": {
+      "type": "string"
+    },
+    "class": {
+      "type": "string"
+    },
+    "subclass": {
+      "type": "string"
+    },
+    "background": {
+      "type": "string"
+    },
+    "alignment": {
+      "type": "string",
+      "enum": [
+        "LG",
+        "NG",
+        "CG",
+        "LN",
+        "N",
+        "CN",
+        "LE",
+        "NE",
+        "CE"
+      ]
+    },
+    "level": {
+      "type": "number",
+      "default": 1
+    },
+    "xp": {
+      "type": "number",
+      "default": 0
+    },
+    "use_milestone": {
+      "type": "boolean",
+      "default": false
+    },
+    "ability_scores": {
+      "type": "object",
+      "properties": {
+        "strength": {
+          "type": "number"
+        },
+        "dexterity": {
+          "type": "number"
+        },
+        "constitution": {
+          "type": "number"
+        },
+        "intelligence": {
+          "type": "number"
+        },
+        "wisdom": {
+          "type": "number"
+        },
+        "charisma": {
+          "type": "number"
+        }
+      }
+    },
+    "saving_throw_proficiencies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "skill_proficiencies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "skill_expertise": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "hp_max": {
+      "type": "number"
+    },
+    "hp_current": {
+      "type": "number"
+    },
+    "hp_temp": {
+      "type": "number",
+      "default": 0
+    },
+    "ac": {
+      "type": "number"
+    },
+    "speed": {
+      "type": "number",
+      "default": 30
+    },
+    "initiative_bonus": {
+      "type": "number"
+    },
+    "hit_dice_total": {
+      "type": "string"
+    },
+    "hit_dice_current": {
+      "type": "string"
+    },
+    "attacks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "attack_bonus": {
+            "type": "number"
+          },
+          "damage": {
+            "type": "string"
+          },
+          "damage_type": {
+            "type": "string"
+          },
+          "properties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "spellcasting": {
+      "type": "object",
+      "properties": {
+        "ability": {
+          "type": "string"
+        },
+        "spell_save_dc": {
+          "type": "number"
+        },
+        "spell_attack_bonus": {
+          "type": "number"
+        },
+        "cantrips": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "spells_known": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "level": {
+                "type": "number"
+              },
+              "prepared": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "spell_slots": {
+          "type": "object",
+          "description": "Keys are spell levels (1-9), values are { total: number, used: number }"
+        }
+      }
+    },
+    "class_resources": {
+      "type": "array",
+      "description": "Custom class resource trackers (Rage, Ki, Sorcery Points, etc.)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "total": {
+            "type": "number"
+          },
+          "used": {
+            "type": "number",
+            "default": 0
+          },
+          "color": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "inventory": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "weight": {
+            "type": "number"
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "currency": {
+      "type": "object",
+      "properties": {
+        "cp": {
+          "type": "number",
+          "default": 0
+        },
+        "sp": {
+          "type": "number",
+          "default": 0
+        },
+        "ep": {
+          "type": "number",
+          "default": 0
+        },
+        "gp": {
+          "type": "number",
+          "default": 0
+        },
+        "pp": {
+          "type": "number",
+          "default": 0
+        }
+      }
+    },
+    "features_traits": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "proficiencies": {
+      "type": "object",
+      "properties": {
+        "armor": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "weapons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "backstory": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "portrait_url": {
+      "type": "string"
+    },
+    "edit_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string"
+          },
+          "changes": {
+            "type": "string"
+          },
+          "snapshot": {
+            "type": "object"
+          }
+        }
+      },
+      "description": "Last 20 edits"
+    }
+  },
+  "required": [
+    "owner_id",
+    "name"
+  ]
+}

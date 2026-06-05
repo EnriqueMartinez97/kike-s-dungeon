@@ -33,6 +33,9 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/components/ui/use-toast';
 import DiceRoller from '@/components/dice/DiceRoller';
+import ClickToRollStat from '@/components/character/ClickToRollStat';
+import SpellSlotTracker from '@/components/character/SpellSlotTracker';
+import ClassResourceTracker from '@/components/character/ClassResourceTracker';
 import { RACES, CLASSES, SUBCLASSES, BACKGROUNDS, ALIGNMENTS as DND_ALIGNMENTS } from '@/components/dnd5eData';
 
 const ABILITIES = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
@@ -56,8 +59,14 @@ export default function CharacterSheet() {
   const [uploading, setUploading] = useState(false);
   const [isNew, setIsNew] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [rollFeed, setRollFeed] = useState([]);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const handleCharRoll = ({ formula, result, label, isCrit, isFail }) => {
+    const entry = { formula, result, label, isCrit, isFail, ts: Date.now() };
+    setRollFeed(prev => [entry, ...prev].slice(0, 6));
+  };
 
   const urlParams = new URLSearchParams(window.location.search);
   const characterId = urlParams.get('id');
@@ -587,6 +596,39 @@ export default function CharacterSheet() {
             </CardContent>
           </Card>
 
+          {/* Class Resources & Spell Slots */}
+          <Card className="bg-slate-900/50 border-slate-800">
+            <CardContent className="p-4 space-y-4">
+              <ClassResourceTracker
+                character={character}
+                onUpdate={setCharacter}
+              />
+              <div className="border-t border-slate-800 pt-3">
+                <SpellSlotTracker
+                  character={character}
+                  onUpdate={setCharacter}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Roll Feed */}
+          {rollFeed.length > 0 && (
+            <Card className="bg-slate-900/50 border-slate-800">
+              <CardContent className="p-3 space-y-1">
+                <p className="text-xs text-slate-500 font-semibold uppercase tracking-wide mb-2">Recent Rolls</p>
+                {rollFeed.map((r, i) => (
+                  <div key={r.ts} className={`flex items-center justify-between text-xs px-2 py-1 rounded ${
+                    r.isCrit ? 'bg-amber-500/20 text-amber-300' : r.isFail ? 'bg-red-500/20 text-red-300' : 'bg-slate-800 text-slate-300'
+                  }`}>
+                    <span>{r.label}</span>
+                    <span className="font-bold">{r.result}{r.isCrit ? ' ⭐' : r.isFail ? ' 💀' : ''}</span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
           {/* Dice Roller */}
           <DiceRoller userName={character.name || user?.display_name || 'Player'} />
         </div>
@@ -658,29 +700,30 @@ export default function CharacterSheet() {
                 {/* Saving Throws */}
                 <Card className="bg-slate-900/50 border-slate-800">
                   <CardHeader>
-                    <CardTitle className="text-white text-sm">Saving Throws</CardTitle>
+                    <CardTitle className="text-white text-sm">Saving Throws <span className="text-xs text-slate-500 font-normal ml-1">(click prof dot to toggle · click row to roll)</span></CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-2">
+                  <CardContent className="space-y-1">
                     {ABILITIES.map((ability) => {
                       const score = character.ability_scores?.[ability] || 10;
                       const mod = getModifier(score);
                       const isProficient = character.saving_throw_proficiencies?.includes(ability);
                       const total = mod + (isProficient ? profBonus : 0);
                       return (
-                        <div 
-                          key={ability}
-                          onClick={() => toggleProficiency('saving_throw_proficiencies', ability)}
-                          className={`flex items-center justify-between p-2 rounded cursor-pointer transition-colors ${
-                            isProficient ? 'bg-violet-500/20' : 'hover:bg-slate-800'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2">
-                            <div className={`w-3 h-3 rounded-full border-2 ${
-                              isProficient ? 'bg-violet-500 border-violet-500' : 'border-slate-500'
-                            }`} />
-                            <span className="text-slate-300 capitalize">{ability}</span>
-                          </div>
-                          <span className="text-white font-medium">{formatModifier(total)}</span>
+                        <div key={ability} className={`flex items-center gap-2 rounded ${isProficient ? 'bg-violet-500/10' : ''}`}>
+                          <button
+                            onClick={() => toggleProficiency('saving_throw_proficiencies', ability)}
+                            className="flex-shrink-0 w-4 h-4 flex items-center justify-center"
+                            title="Toggle proficiency"
+                          >
+                            <div className={`w-3 h-3 rounded-full border-2 ${isProficient ? 'bg-violet-500 border-violet-500' : 'border-slate-500 hover:border-violet-400'}`} />
+                          </button>
+                          <ClickToRollStat
+                            label={<span className="capitalize">{ability}</span>}
+                            modifier={total}
+                            bonus={0}
+                            onRoll={(r) => handleCharRoll({ ...r, label: `${ability} save` })}
+                            className="flex-1"
+                          />
                         </div>
                       );
                     })}
@@ -690,9 +733,9 @@ export default function CharacterSheet() {
                 {/* Skills */}
                 <Card className="bg-slate-900/50 border-slate-800">
                   <CardHeader>
-                    <CardTitle className="text-white text-sm">Skills</CardTitle>
+                    <CardTitle className="text-white text-sm">Skills <span className="text-xs text-slate-500 font-normal ml-1">(click dot to toggle prof · click row to roll)</span></CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-1 max-h-[400px] overflow-y-auto">
+                  <CardContent className="space-y-0.5 max-h-[400px] overflow-y-auto">
                     {Object.entries(SKILLS).flatMap(([ability, skills]) => 
                       skills.map((skill) => {
                         const score = character.ability_scores?.[ability] || 10;
@@ -702,22 +745,24 @@ export default function CharacterSheet() {
                         const bonus = isProficient ? (hasExpertise ? profBonus * 2 : profBonus) : 0;
                         const total = mod + bonus;
                         return (
-                          <div 
-                            key={skill}
-                            onClick={() => toggleProficiency('skill_proficiencies', skill)}
-                            className={`flex items-center justify-between p-2 rounded cursor-pointer transition-colors ${
-                              isProficient ? 'bg-violet-500/20' : 'hover:bg-slate-800'
-                            }`}
-                          >
-                            <div className="flex items-center gap-2">
+                          <div key={skill} className={`flex items-center gap-2 rounded ${isProficient ? 'bg-violet-500/10' : ''}`}>
+                            <button
+                              onClick={() => toggleProficiency('skill_proficiencies', skill)}
+                              className="flex-shrink-0 w-4 h-4 flex items-center justify-center"
+                              title="Toggle proficiency"
+                            >
                               <div className={`w-3 h-3 rounded-full border-2 ${
                                 hasExpertise ? 'bg-amber-500 border-amber-500' :
-                                isProficient ? 'bg-violet-500 border-violet-500' : 'border-slate-500'
+                                isProficient ? 'bg-violet-500 border-violet-500' : 'border-slate-500 hover:border-violet-400'
                               }`} />
-                              <span className="text-slate-300">{skill}</span>
-                              <span className="text-xs text-slate-500">({ability.slice(0, 3)})</span>
-                            </div>
-                            <span className="text-white font-medium">{formatModifier(total)}</span>
+                            </button>
+                            <ClickToRollStat
+                              label={<span>{skill} <span className="text-slate-600 text-xs">({ability.slice(0,3)})</span></span>}
+                              modifier={total}
+                              bonus={0}
+                              onRoll={(r) => handleCharRoll({ ...r, label: skill })}
+                              className="flex-1"
+                            />
                           </div>
                         );
                       })
@@ -796,6 +841,20 @@ export default function CharacterSheet() {
                             />
                           </div>
                         </div>
+                        {/* Click-to-roll attack */}
+                        {attack.name && (
+                          <div className="flex gap-2 pt-1 border-t border-slate-700">
+                            <div className="flex-1">
+                              <p className="text-xs text-slate-500 mb-1">Attack Roll</p>
+                              <ClickToRollStat
+                                label={attack.name}
+                                modifier={attack.attack_bonus || 0}
+                                bonus={0}
+                                onRoll={(r) => handleCharRoll({ ...r, label: `${attack.name} attack` })}
+                              />
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))
                   )}
@@ -857,6 +916,42 @@ export default function CharacterSheet() {
                     </div>
                   </div>
 
+                  {/* Spell Slot Configuration */}
+                  <div>
+                    <Label className="text-slate-400 text-sm">Spell Slot Configuration</Label>
+                    <p className="text-xs text-slate-600 mb-3">Set how many spell slots you have per level. Track usage from the left sidebar.</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[1,2,3,4,5,6,7,8,9].map(lvl => {
+                        const slot = character.spellcasting?.spell_slots?.[String(lvl)] || {};
+                        return (
+                          <div key={lvl} className="bg-slate-800 rounded p-2">
+                            <Label className="text-xs text-slate-400">Level {lvl}</Label>
+                            <Input
+                              type="number"
+                              min={0}
+                              max={9}
+                              value={slot.total || 0}
+                              onChange={(e) => {
+                                const total = parseInt(e.target.value) || 0;
+                                setCharacter(prev => ({
+                                  ...prev,
+                                  spellcasting: {
+                                    ...prev.spellcasting,
+                                    spell_slots: {
+                                      ...(prev.spellcasting?.spell_slots || {}),
+                                      [String(lvl)]: { total, used: Math.min(slot.used || 0, total) }
+                                    }
+                                  }
+                                }));
+                              }}
+                              className="mt-1 bg-slate-700 border-slate-600 text-white text-center h-8"
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
                   <div>
                     <Label className="text-slate-400">Cantrips (comma-separated)</Label>
                     <Textarea
@@ -873,9 +968,7 @@ export default function CharacterSheet() {
                     />
                   </div>
 
-                  <p className="text-slate-500 text-sm">
-                    Full spell management coming soon. For now, track spells in the Notes section.
-                  </p>
+                  <p className="text-slate-500 text-sm">Full spell list management coming soon. Track prepared spells in Notes for now.</p>
                 </CardContent>
               </Card>
             </TabsContent>

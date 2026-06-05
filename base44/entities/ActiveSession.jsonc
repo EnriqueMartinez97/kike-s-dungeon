@@ -1,0 +1,75 @@
+{
+  "name": "ActiveSession",
+  "type": "object",
+  "properties": {
+    "campaign_id": {
+      "type": "string"
+    },
+    "dm_id": {
+      "type": "string"
+    },
+    "session_start": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "session_end": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "planning",
+        "active",
+        "in_combat",
+        "closed"
+      ],
+      "default": "planning"
+    },
+    "combat_active": {
+      "type": "boolean",
+      "default": false
+    },
+    "current_round": {
+      "type": "number",
+      "default": 0
+    },
+    "current_turn": {
+      "type": "number",
+      "default": 0
+    },
+    "current_combatant_id": {
+      "type": "string"
+    },
+    "online_users": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "participants": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string"
+          },
+          "character_id": {
+            "type": "string"
+          },
+          "character_name": {
+            "type": "string"
+          },
+          "is_online": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "campaign_id",
+    "dm_id"
+  ]
+}
