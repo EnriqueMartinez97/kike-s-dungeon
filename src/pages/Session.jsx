@@ -56,6 +56,7 @@ export default function Session() {
   const [episodeRecap, setEpisodeRecap] = useState('');
   const [closingSession, setClosingSession] = useState(false);
   const [selectedEpisodeLogs, setSelectedEpisodeLogs] = useState(null);
+  const [quickSheetCharId, setQuickSheetCharId] = useState(null);
 
   const navigate = useNavigate();
   const urlParams = new URLSearchParams(window.location.search);
@@ -420,7 +421,14 @@ export default function Session() {
                         <QuickQuestPanel campaignId={campaignId} quests={quests} setQuests={setQuests} isDM={isDM} userId={user?.id} userName={user?.full_name} />
                       </TabsContent>
                       <TabsContent value="characters">
-                        <CharactersPanel campaignId={campaignId} isDM={isDM} characters={characters} />
+                        <CharactersPanel
+                          campaignId={campaignId}
+                          isDM={isDM}
+                          characters={characters}
+                          setCharacters={setCharacters}
+                          currentUserId={user?.id}
+                          onViewSheet={(charId) => { setQuickSheetCharId(charId); setSessionTab('sheets'); }}
+                        />
                       </TabsContent>
                       {isDM && (
                         <TabsContent value="npcs">
@@ -486,7 +494,13 @@ export default function Session() {
               </TabsContent>
 
               <TabsContent value="sheets" className="mt-4">
-                <QuickSheets campaignId={campaignId} isDM={isDM} userId={user?.id} />
+                <QuickSheets
+                  key={quickSheetCharId || 'default'}
+                  campaignId={campaignId}
+                  isDM={isDM}
+                  userId={user?.id}
+                  initialSelectedCharId={quickSheetCharId}
+                />
               </TabsContent>
 
               <TabsContent value="dice" className="mt-4">

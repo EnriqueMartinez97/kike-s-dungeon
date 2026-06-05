@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { base44 } from '@/api/base44Client';
 
-export default function CharactersPanel({ characters, setCharacters, isDM, currentUserId }) {
+export default function CharactersPanel({ characters, setCharacters, isDM, currentUserId, onViewSheet }) {
   const [expanded, setExpanded] = useState({});
   const [editing, setEditing] = useState({});
   const [editVals, setEditVals] = useState({});
@@ -121,11 +121,18 @@ export default function CharactersPanel({ characters, setCharacters, isDM, curre
                             <span className="text-slate-400">Background</span><span className="text-white">{char.background}</span>
                           </div>
                         )}
-                        {canEdit(char) && (
-                          <Button size="sm" variant="ghost" onClick={() => startEdit(char)} className="w-full h-7 text-xs text-slate-400 hover:text-white mt-1">
-                            <Edit2 className="h-3 w-3 mr-1" />Quick Edit
-                          </Button>
-                        )}
+                        <div className="flex gap-1 mt-1">
+                          {onViewSheet && (
+                            <Button size="sm" variant="ghost" onClick={() => onViewSheet(char.id)} className="flex-1 h-7 text-xs text-violet-400 hover:text-violet-300 hover:bg-violet-500/10">
+                              <Scroll className="h-3 w-3 mr-1" />View Sheet
+                            </Button>
+                          )}
+                          {canEdit(char) && (
+                            <Button size="sm" variant="ghost" onClick={() => startEdit(char)} className="flex-1 h-7 text-xs text-slate-400 hover:text-white">
+                              <Edit2 className="h-3 w-3 mr-1" />Edit
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>

@@ -25,12 +25,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-export default function QuickSheets({ campaignId, isDM, userId }) {
+export default function QuickSheets({ campaignId, isDM, userId, initialSelectedCharId = null }) {
    const [characters, setCharacters] = useState([]);
    const [npcs, setNpcs] = useState([]);
    const [members, setMembers] = useState([]);
    const [loading, setLoading] = useState(true);
-   const [selectedCharId, setSelectedCharId] = useState(null);
+   const [selectedCharId, setSelectedCharId] = useState(initialSelectedCharId);
    const [levelUpDialogOpen, setLevelUpDialogOpen] = useState(false);
    const [levelUpMode, setLevelUpMode] = useState('auto');
    const [newInventoryOpen, setNewInventoryOpen] = useState(false);
@@ -319,113 +319,196 @@ export default function QuickSheets({ campaignId, isDM, userId }) {
     setCharacters(prev => prev.map(c => c.id === updatedChar.id ? updatedChar : c));
   };
 
+  const [lastRoll, setLastRoll] = useState(null);
+
   const CharacterDetailView = ({ character, onClose }) => {
     if (!character) return null;
-
     const abilities = character.ability_scores || {};
     const inventory = character.inventory || [];
     const profBonus = Math.floor(((character.level || 1) - 1) / 4) + 2;
 
-    const rollSkill = (label, mod) => {
+    const roll = (label, mod) => {
       const d20 = Math.floor(Math.random() * 20) + 1;
-      alert(`${label}: d20(${d20}) + ${mod} = ${d20 + mod}`);
+      const total = d20 + mod;
+      const isCrit = d20 === 20;
+      const isFumble = d20 === 1;
+      setLastRoll({ label, d20, mod, total, isCrit, isFumble });
+    };
+
+    const abilityMod = (score) => Math.floor(((score || 10) - 10) / 2);
+
+    const SKILLS = [
+      { name: 'Acrobatics', ability: 'dexterity' },
+      { name: 'Animal Handling', ability: 'wisdom' },
+      { name: 'Arcana', ability: 'intelligence' },
+      { name: 'Athletics', ability: 'strength' },
+      { name: 'Deception', ability: 'charisma' },
+      { name: 'History', ability: 'intelligence' },
+      { name: 'Insight', ability: 'wisdom' },
+      { name: 'Intimidation', ability: 'charisma' },
+      { name: 'Investigation', ability: 'intelligence' },
+      { name: 'Medicine', ability: 'wisdom' },
+      { name: 'Nature', ability: 'intelligence' },
+      { name: 'Perception', ability: 'wisdom' },
+      { name: 'Performance', ability: 'charisma' },
+      { name: 'Persuasion', ability: 'charisma' },
+      { name: 'Religion', ability: 'intelligence' },
+      { name: 'Sleight of Hand', ability: 'dexterity' },
+      { name: 'Stealth', ability: 'dexterity' },
+      { name: 'Survival', ability: 'wisdom' },
+    ];
+
+    const skillMod = (skill) => {
+      const base = abilityMod(abilities[skill.ability]);
+      const proficiencies = character.skill_proficiencies || [];
+      const expertise = character.skill_expertise || [];
+      const skillKey = skill.name.toLowerCase().replace(/ /g, '_');
+      if (expertise.includes(skillKey)) return base + profBonus * 2;
+      if (proficiencies.includes(skillKey)) return base + profBonus;
+      return base;
     };
 
     return (
       <Dialog open={!!character} onOpenChange={onClose}>
-        <DialogContent className="bg-slate-900 border-slate-800 max-w-2xl max-h-[80vh] flex flex-col">
+        <DialogContent className="bg-slate-900 border-slate-800 max-w-2xl max-h-[85vh] flex flex-col">
           <DialogHeader>
-            <DialogTitle className="text-white">{character.name} - Level {character.level || 1} {character.class || ''}</DialogTitle>
+            <DialogTitle className="text-white">{character.name} — Lvl {character.level || 1} {character.race || ''} {character.class || ''}</DialogTitle>
           </DialogHeader>
 
-          <Tabs defaultValue="stats" className="flex-1">
-            <TabsList className="bg-slate-800 border border-slate-700 w-full justify-start flex-wrap">
-              <TabsTrigger value="stats" className="text-xs">Stats</TabsTrigger>
+          {/* Roll result banner */}
+          {lastRoll && (
+            <div className={`flex items-center justify-between px-4 py-2 rounded-lg text-sm font-semibold mx-1 ${lastRoll.isCrit ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : lastRoll.isFumble ? 'bg-red-500/20 text-red-300 border border-red-500/40' : 'bg-violet-500/20 text-violet-200 border border-violet-500/30'}`}>
+              <span>{lastRoll.label}</span>
+              <span>
+                d20({lastRoll.d20}) {lastRoll.mod >= 0 ? '+' : ''}{lastRoll.mod} = <span className="text-white text-base">{lastRoll.total}</span>
+                {lastRoll.isCrit && ' ⭐ CRIT!'}
+                {lastRoll.isFumble && ' 💀 FUMBLE'}
+              </span>
+              <button onClick={() => setLastRoll(null)} className="text-slate-400 hover:text-white text-xs">✕</button>
+            </div>
+          )}
+
+          <Tabs defaultValue="stats" className="flex-1 overflow-hidden flex flex-col">
+            <TabsList className="bg-slate-800 border border-slate-700 w-full justify-start flex-wrap flex-shrink-0">
+              <TabsTrigger value="stats" className="text-xs">Abilities</TabsTrigger>
+              <TabsTrigger value="skills" className="text-xs">Skills</TabsTrigger>
+              <TabsTrigger value="attacks" className="text-xs">Attacks</TabsTrigger>
               <TabsTrigger value="resources" className="text-xs">Resources</TabsTrigger>
               <TabsTrigger value="inventory" className="text-xs">Inventory</TabsTrigger>
-              <TabsTrigger value="level" className="text-xs">Level Up</TabsTrigger>
+              {isDM && <TabsTrigger value="level" className="text-xs">Level Up</TabsTrigger>}
             </TabsList>
 
             <ScrollArea className="flex-1">
               <div className="p-4">
-                {/* Stats Tab */}
-                <TabsContent value="stats" className="space-y-3">
+                {/* Abilities Tab */}
+                <TabsContent value="stats" className="space-y-3 mt-0">
                   <div className="grid grid-cols-3 gap-2">
-                    {['strength', 'dexterity', 'constitution'].map(ab => (
-                      <div key={ab} className="bg-slate-800 p-2 rounded">
-                        <p className="text-xs text-slate-400 uppercase">{ab.slice(0, 3)}</p>
-                        <p className="text-lg font-bold text-white">{abilities[ab] || 10}</p>
-                        <p className="text-xs text-slate-500">+{Math.floor(((abilities[ab] || 10) - 10) / 2)}</p>
-                      </div>
-                    ))}
+                    {['strength','dexterity','constitution','intelligence','wisdom','charisma'].map(ab => {
+                      const score = abilities[ab] || 10;
+                      const mod = abilityMod(score);
+                      const hasSave = (character.saving_throw_proficiencies || []).includes(ab);
+                      const saveTotal = mod + (hasSave ? profBonus : 0);
+                      return (
+                        <button
+                          key={ab}
+                          onClick={() => roll(ab.slice(0,3).toUpperCase() + ' Save', saveTotal)}
+                          className="bg-slate-800 hover:bg-violet-500/20 hover:border-violet-500/40 border border-transparent p-3 rounded-lg text-center transition-all group"
+                          title={`Click to roll ${ab} saving throw`}
+                        >
+                          <p className="text-xs text-slate-400 uppercase tracking-wide">{ab.slice(0,3)}</p>
+                          <p className="text-2xl font-bold text-white">{score}</p>
+                          <p className="text-sm font-semibold text-violet-300">{mod >= 0 ? '+' : ''}{mod}</p>
+                          {hasSave && <p className="text-xs text-amber-400 mt-1">Save {saveTotal >= 0 ? '+' : ''}{saveTotal}</p>}
+                          <p className="text-[10px] text-slate-600 group-hover:text-violet-400 transition-colors mt-1">click to save</p>
+                        </button>
+                      );
+                    })}
                   </div>
-                  <div className="grid grid-cols-3 gap-2">
-                    {['intelligence', 'wisdom', 'charisma'].map(ab => (
-                      <div key={ab} className="bg-slate-800 p-2 rounded">
-                        <p className="text-xs text-slate-400 uppercase">{ab.slice(0, 3)}</p>
-                        <p className="text-lg font-bold text-white">{abilities[ab] || 10}</p>
-                        <p className="text-xs text-slate-500">+{Math.floor(((abilities[ab] || 10) - 10) / 2)}</p>
-                      </div>
-                    ))}
+                  <div className="grid grid-cols-3 gap-2 text-xs">
+                    <div className="bg-slate-800 p-2 rounded text-center">
+                      <p className="text-slate-400">AC</p>
+                      <p className="text-white font-bold text-lg">{character.ac || 10}</p>
+                    </div>
+                    <div className="bg-slate-800 p-2 rounded text-center">
+                      <p className="text-slate-400">Speed</p>
+                      <p className="text-white font-bold text-lg">{character.speed || 30}ft</p>
+                    </div>
+                    <button
+                      onClick={() => roll('Initiative', abilityMod(abilities.dexterity) + (character.initiative_bonus || 0))}
+                      className="bg-slate-800 hover:bg-violet-500/20 border border-transparent hover:border-violet-500/40 p-2 rounded text-center transition-all"
+                    >
+                      <p className="text-slate-400">Initiative</p>
+                      <p className="text-white font-bold text-lg">{abilityMod(abilities.dexterity) + (character.initiative_bonus || 0) >= 0 ? '+' : ''}{abilityMod(abilities.dexterity) + (character.initiative_bonus || 0)}</p>
+                    </button>
                   </div>
-                  <div className="grid grid-cols-2 gap-2 pt-2">
-                    <div className="bg-slate-800 p-3 rounded">
-                      <p className="text-xs text-slate-400">Hit Dice</p>
-                      <p className="text-sm text-white">{character.hit_dice_current || character.hit_dice_total || 'd8'}</p>
-                    </div>
-                    <div className="bg-slate-800 p-3 rounded">
-                      <p className="text-xs text-slate-400">Speed</p>
-                      <p className="text-sm text-white">{character.speed || 30} ft</p>
-                    </div>
+                  <div className="bg-slate-800 p-2 rounded text-xs flex justify-between">
+                    <span className="text-slate-400">Hit Dice</span>
+                    <span className="text-white">{character.hit_dice_current || character.hit_dice_total || 'd8'}</span>
                   </div>
                 </TabsContent>
 
-                {/* Resources Tab */}
-                <TabsContent value="resources" className="space-y-4 p-1">
-                  <ClassResourceTracker
-                    character={character}
-                    onUpdate={handleResourceUpdate}
-                  />
-                  <div className="border-t border-slate-800 pt-3">
-                    <SpellSlotTracker
-                      character={character}
-                      onUpdate={handleResourceUpdate}
-                    />
+                {/* Skills Tab */}
+                <TabsContent value="skills" className="mt-0">
+                  <div className="space-y-0.5">
+                    {SKILLS.map(skill => {
+                      const mod = skillMod(skill);
+                      const proficiencies = character.skill_proficiencies || [];
+                      const expertise = character.skill_expertise || [];
+                      const skillKey = skill.name.toLowerCase().replace(/ /g, '_');
+                      const hasProf = proficiencies.includes(skillKey);
+                      const hasExpert = expertise.includes(skillKey);
+                      return (
+                        <button
+                          key={skill.name}
+                          onClick={() => roll(skill.name, mod)}
+                          className="w-full flex items-center justify-between px-3 py-1.5 rounded hover:bg-violet-500/20 hover:border-violet-500/30 border border-transparent transition-all text-xs"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className={`w-2 h-2 rounded-full flex-shrink-0 ${hasExpert ? 'bg-amber-400' : hasProf ? 'bg-violet-400' : 'bg-slate-700'}`} />
+                            <span className="text-slate-300">{skill.name}</span>
+                            <span className="text-slate-500 text-[10px]">{skill.ability.slice(0,3).toUpperCase()}</span>
+                          </div>
+                          <span className="font-semibold text-violet-300">{mod >= 0 ? '+' : ''}{mod}</span>
+                        </button>
+                      );
+                    })}
                   </div>
-                  {/* Quick attack rolls */}
-                  {(character.attacks || []).length > 0 && (
-                    <div className="border-t border-slate-800 pt-3">
-                      <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">Attack Rolls</p>
-                      <div className="space-y-1">
-                        {character.attacks.map((atk, i) => {
-                          const bonus = atk.attack_bonus || 0;
-                          return (
-                            <button
-                              key={i}
-                              onClick={() => {
-                                const d20 = Math.floor(Math.random() * 20) + 1;
-                                const total = d20 + bonus;
-                                const isCrit = d20 === 20;
-                                const msg = `${atk.name}: ${d20}${bonus >= 0 ? '+' : ''}${bonus} = ${total}${isCrit ? ' ⭐ CRIT!' : ''}`;
-                                // Simple toast-style alert
-                                const el = document.createElement('div');
-                                el.textContent = msg;
-                                el.style.cssText = 'position:fixed;top:16px;right:16px;z-index:9999;background:#7c3aed;color:white;padding:8px 16px;border-radius:8px;font-size:14px;font-weight:bold';
-                                document.body.appendChild(el);
-                                setTimeout(() => el.remove(), 2500);
-                              }}
-                              className="w-full flex items-center justify-between px-3 py-2 rounded bg-slate-800 hover:bg-violet-500/20 border border-transparent hover:border-violet-500/30 transition-all text-xs"
-                            >
-                              <span className="text-slate-300">{atk.name} <span className="text-slate-500">{atk.damage && `(${atk.damage})`}</span></span>
-                              <span className="flex items-center gap-1 text-violet-400 font-semibold">
-                                {bonus >= 0 ? `+${bonus}` : bonus} <Dice6 className="h-3 w-3" />
-                              </span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
+                  <p className="text-[10px] text-slate-600 text-center mt-2">Click any skill to roll</p>
+                </TabsContent>
+
+                {/* Attacks Tab */}
+                <TabsContent value="attacks" className="mt-0 space-y-2">
+                  {(character.attacks || []).length === 0 ? (
+                    <p className="text-slate-500 text-xs text-center py-6">No attacks configured</p>
+                  ) : (
+                    character.attacks.map((atk, i) => {
+                      const bonus = atk.attack_bonus || 0;
+                      return (
+                        <button
+                          key={i}
+                          onClick={() => roll(atk.name + ' Attack', bonus)}
+                          className="w-full flex items-center justify-between px-3 py-3 rounded-lg bg-slate-800 hover:bg-violet-500/20 border border-transparent hover:border-violet-500/30 transition-all"
+                        >
+                          <div className="text-left">
+                            <p className="text-sm text-white font-medium">{atk.name}</p>
+                            <p className="text-xs text-slate-400">{atk.damage} {atk.damage_type}</p>
+                            {atk.properties && <p className="text-xs text-slate-500">{atk.properties}</p>}
+                          </div>
+                          <span className="flex items-center gap-1 text-violet-300 font-bold text-sm">
+                            {bonus >= 0 ? `+${bonus}` : bonus} <Dice6 className="h-4 w-4" />
+                          </span>
+                        </button>
+                      );
+                    })
                   )}
+                </TabsContent>
+
+                {/* Resources Tab */}
+                <TabsContent value="resources" className="space-y-4 p-1 mt-0">
+                  <ClassResourceTracker character={character} onUpdate={handleResourceUpdate} />
+                  <div className="border-t border-slate-800 pt-3">
+                    <SpellSlotTracker character={character} onUpdate={handleResourceUpdate} />
+                  </div>
                 </TabsContent>
 
                 {/* Inventory Tab */}
