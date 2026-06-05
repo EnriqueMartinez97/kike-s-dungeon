@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Plus, Minus, Heart, Shield, Backpack, TrendingUp, Settings, Trash2, X, Dice6 } from 'lucide-react';
+import { Plus, Minus, Heart, Shield, Backpack, TrendingUp, Settings, Trash2, X, Dice6, Pencil, Check } from 'lucide-react';
 import SpellSlotTracker from '@/components/character/SpellSlotTracker';
 import ClassResourceTracker from '@/components/character/ClassResourceTracker';
 import { logDamage, logHeal, logStatusChange } from './sessionLogHelper';
@@ -320,10 +320,38 @@ export default function QuickSheets({ campaignId, isDM, userId, initialSelectedC
   };
 
   const [lastRoll, setLastRoll] = useState(null);
+  const [editMode, setEditMode] = useState(false);
+  const [editValsDetail, setEditValsDetail] = useState({});
+
+  const saveDetailEdit = async (character) => {
+    const updates = {};
+    if (editValsDetail.ability_scores) updates.ability_scores = editValsDetail.ability_scores;
+    if (editValsDetail.ac !== undefined) updates.ac = parseInt(editValsDetail.ac) || character.ac;
+    if (editValsDetail.speed !== undefined) updates.speed = parseInt(editValsDetail.speed) || character.speed;
+    if (editValsDetail.hp_max !== undefined) updates.hp_max = parseInt(editValsDetail.hp_max) || character.hp_max;
+    if (editValsDetail.hp_current !== undefined) updates.hp_current = parseInt(editValsDetail.hp_current) || character.hp_current;
+    if (editValsDetail.skill_proficiencies !== undefined) updates.skill_proficiencies = editValsDetail.skill_proficiencies;
+    await base44.entities.Character.update(character.id, updates);
+    setCharacters(prev => prev.map(c => c.id === character.id ? { ...c, ...updates } : c));
+    setEditMode(false);
+    setEditValsDetail({});
+  };
+
+  const startDetailEdit = (character) => {
+    setEditValsDetail({
+      ability_scores: { ...(character.ability_scores || {}) },
+      ac: character.ac ?? 10,
+      speed: character.speed ?? 30,
+      hp_max: character.hp_max ?? 0,
+      hp_current: character.hp_current ?? 0,
+      skill_proficiencies: [...(character.skill_proficiencies || [])],
+    });
+    setEditMode(true);
+  };
 
   const CharacterDetailView = ({ character, onClose }) => {
     if (!character) return null;
-    const abilities = character.ability_scores || {};
+    const abilities = editMode && editValsDetail.ability_scores ? editValsDetail.ability_scores : (character.ability_scores || {});
     const inventory = character.inventory || [];
     const profBonus = Math.floor(((character.level || 1) - 1) / 4) + 2;
 
@@ -369,10 +397,23 @@ export default function QuickSheets({ campaignId, isDM, userId, initialSelectedC
     };
 
     return (
-      <Dialog open={!!character} onOpenChange={onClose}>
+      <Dialog open={!!character} onOpenChange={() => { setEditMode(false); setEditValsDetail({}); onClose(); }}>
         <DialogContent className="bg-slate-900 border-slate-800 max-w-2xl max-h-[85vh] flex flex-col">
           <DialogHeader>
-            <DialogTitle className="text-white">{character.name} — Lvl {character.level || 1} {character.race || ''} {character.class || ''}</DialogTitle>
+            <div className="flex items-center justify-between pr-8">
+              <DialogTitle className="text-white">{character.name} — Lvl {character.level || 1} {character.race || ''} {character.class || ''}</DialogTitle>
+              {(isDM || character.owner_id === userId) && (
+                editMode ? (
+                  <Button size="sm" onClick={() => saveDetailEdit(character)} className="h-7 px-2 bg-emerald-600 hover:bg-emerald-700 text-xs flex items-center gap-1">
+                    <Check className="h-3 w-3" /> Save
+                  </Button>
+                ) : (
+                  <Button size="sm" variant="ghost" onClick={() => startDetailEdit(character)} className="h-7 px-2 text-slate-400 hover:text-white text-xs flex items-center gap-1">
+                    <Pencil className="h-3 w-3" /> Edit
+                  </Button>
+                )
+              )}
+            </div>
           </DialogHeader>
 
           {/* Roll result banner */}
@@ -408,7 +449,19 @@ export default function QuickSheets({ campaignId, isDM, userId, initialSelectedC
                       const mod = abilityMod(score);
                       const hasSave = (character.saving_throw_proficiencies || []).includes(ab);
                       const saveTotal = mod + (hasSave ? profBonus : 0);
-                      return (
+                      return editMode ? (
+                        <div key={ab} className="bg-slate-800 border border-violet-500/30 p-3 rounded-lg text-center">
+                          <p className="text-xs text-slate-400 uppercase tracking-wide mb-1">{ab.slice(0,3)}</p>
+                          <input
+                            type="number"
+                            value={editValsDetail.ability_scores?.[ab] ?? score}
+                            onChange={e => setEditValsDetail(prev => ({ ...prev, ability_scores: { ...prev.ability_scores, [ab]: parseInt(e.target.value) || 10 } }))}
+                            className="w-full text-center text-xl font-bold bg-slate-900 border border-slate-600 rounded text-white"
+                            min="1" max="30"
+                          />
+                          <p className="text-xs text-violet-300 mt-1">{mod >= 0 ? '+' : ''}{mod}</p>
+                        </div>
+                      ) : (
                         <button
                           key={ab}
                           onClick={() => roll(ab.slice(0,3).toUpperCase() + ' Save', saveTotal)}
@@ -425,55 +478,91 @@ export default function QuickSheets({ campaignId, isDM, userId, initialSelectedC
                     })}
                   </div>
                   <div className="grid grid-cols-3 gap-2 text-xs">
-                    <div className="bg-slate-800 p-2 rounded text-center">
-                      <p className="text-slate-400">AC</p>
-                      <p className="text-white font-bold text-lg">{character.ac || 10}</p>
-                    </div>
-                    <div className="bg-slate-800 p-2 rounded text-center">
-                      <p className="text-slate-400">Speed</p>
-                      <p className="text-white font-bold text-lg">{character.speed || 30}ft</p>
-                    </div>
-                    <button
-                      onClick={() => roll('Initiative', abilityMod(abilities.dexterity) + (character.initiative_bonus || 0))}
-                      className="bg-slate-800 hover:bg-violet-500/20 border border-transparent hover:border-violet-500/40 p-2 rounded text-center transition-all"
-                    >
-                      <p className="text-slate-400">Initiative</p>
-                      <p className="text-white font-bold text-lg">{abilityMod(abilities.dexterity) + (character.initiative_bonus || 0) >= 0 ? '+' : ''}{abilityMod(abilities.dexterity) + (character.initiative_bonus || 0)}</p>
-                    </button>
+                    {editMode ? (
+                      <>
+                        <div className="bg-slate-800 border border-violet-500/30 p-2 rounded text-center">
+                          <p className="text-slate-400 mb-1">AC</p>
+                          <input type="number" value={editValsDetail.ac ?? character.ac ?? 10} onChange={e => setEditValsDetail(p => ({ ...p, ac: e.target.value }))} className="w-full text-center font-bold text-lg bg-slate-900 border border-slate-600 rounded text-white" />
+                        </div>
+                        <div className="bg-slate-800 border border-violet-500/30 p-2 rounded text-center">
+                          <p className="text-slate-400 mb-1">Speed</p>
+                          <input type="number" value={editValsDetail.speed ?? character.speed ?? 30} onChange={e => setEditValsDetail(p => ({ ...p, speed: e.target.value }))} className="w-full text-center font-bold text-lg bg-slate-900 border border-slate-600 rounded text-white" />
+                        </div>
+                        <div className="bg-slate-800 border border-violet-500/30 p-2 rounded text-center">
+                          <p className="text-slate-400 mb-1">HP Max</p>
+                          <input type="number" value={editValsDetail.hp_max ?? character.hp_max ?? 0} onChange={e => setEditValsDetail(p => ({ ...p, hp_max: e.target.value }))} className="w-full text-center font-bold text-lg bg-slate-900 border border-slate-600 rounded text-white" />
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="bg-slate-800 p-2 rounded text-center">
+                          <p className="text-slate-400">AC</p>
+                          <p className="text-white font-bold text-lg">{character.ac || 10}</p>
+                        </div>
+                        <div className="bg-slate-800 p-2 rounded text-center">
+                          <p className="text-slate-400">Speed</p>
+                          <p className="text-white font-bold text-lg">{character.speed || 30}ft</p>
+                        </div>
+                        <button
+                          onClick={() => roll('Initiative', abilityMod(abilities.dexterity) + (character.initiative_bonus || 0))}
+                          className="bg-slate-800 hover:bg-violet-500/20 border border-transparent hover:border-violet-500/40 p-2 rounded text-center transition-all"
+                        >
+                          <p className="text-slate-400">Initiative</p>
+                          <p className="text-white font-bold text-lg">{abilityMod(abilities.dexterity) + (character.initiative_bonus || 0) >= 0 ? '+' : ''}{abilityMod(abilities.dexterity) + (character.initiative_bonus || 0)}</p>
+                        </button>
+                      </>
+                    )}
                   </div>
                   <div className="bg-slate-800 p-2 rounded text-xs flex justify-between">
                     <span className="text-slate-400">Hit Dice</span>
                     <span className="text-white">{character.hit_dice_current || character.hit_dice_total || 'd8'}</span>
                   </div>
+                  {editMode && <p className="text-[10px] text-violet-400 text-center">✏ Edit mode — click Save when done</p>}
                 </TabsContent>
 
                 {/* Skills Tab */}
                 <TabsContent value="skills" className="mt-0">
+                  {editMode && <p className="text-[10px] text-violet-400 text-center mb-2">✏ Click dot to toggle proficiency</p>}
                   <div className="space-y-0.5">
                     {SKILLS.map(skill => {
-                      const mod = skillMod(skill);
-                      const proficiencies = character.skill_proficiencies || [];
-                      const expertise = character.skill_expertise || [];
                       const skillKey = skill.name.toLowerCase().replace(/ /g, '_');
-                      const hasProf = proficiencies.includes(skillKey);
+                      const currentProfs = editMode ? (editValsDetail.skill_proficiencies || []) : (character.skill_proficiencies || []);
+                      const expertise = character.skill_expertise || [];
+                      const hasProf = currentProfs.includes(skillKey);
                       const hasExpert = expertise.includes(skillKey);
+                      const base = abilityMod(abilities[skill.ability]);
+                      const mod = hasExpert ? base + profBonus * 2 : hasProf ? base + profBonus : base;
                       return (
-                        <button
+                        <div
                           key={skill.name}
-                          onClick={() => roll(skill.name, mod)}
-                          className="w-full flex items-center justify-between px-3 py-1.5 rounded hover:bg-violet-500/20 hover:border-violet-500/30 border border-transparent transition-all text-xs"
+                          className="w-full flex items-center justify-between px-3 py-1.5 rounded border border-transparent text-xs"
                         >
-                          <div className="flex items-center gap-2">
-                            <span className={`w-2 h-2 rounded-full flex-shrink-0 ${hasExpert ? 'bg-amber-400' : hasProf ? 'bg-violet-400' : 'bg-slate-700'}`} />
+                          <div className="flex items-center gap-2 flex-1">
+                            <button
+                              onClick={() => {
+                                if (editMode) {
+                                  const profs = editValsDetail.skill_proficiencies || [];
+                                  setEditValsDetail(p => ({ ...p, skill_proficiencies: hasProf ? profs.filter(k => k !== skillKey) : [...profs, skillKey] }));
+                                }
+                              }}
+                              className={`w-2.5 h-2.5 rounded-full flex-shrink-0 border transition-all ${editMode ? 'cursor-pointer hover:scale-150' : 'cursor-default'} ${hasExpert ? 'bg-amber-400 border-amber-400' : hasProf ? 'bg-violet-400 border-violet-400' : 'bg-transparent border-slate-600'}`}
+                              title={editMode ? (hasProf ? 'Remove proficiency' : 'Add proficiency') : undefined}
+                            />
                             <span className="text-slate-300">{skill.name}</span>
                             <span className="text-slate-500 text-[10px]">{skill.ability.slice(0,3).toUpperCase()}</span>
                           </div>
-                          <span className="font-semibold text-violet-300">{mod >= 0 ? '+' : ''}{mod}</span>
-                        </button>
+                          <button
+                            onClick={() => !editMode && roll(skill.name, mod)}
+                            disabled={editMode}
+                            className={`font-semibold text-violet-300 px-2 py-0.5 rounded transition-all ${!editMode ? 'hover:bg-violet-500/20 cursor-pointer' : 'cursor-default opacity-60'}`}
+                          >
+                            {mod >= 0 ? '+' : ''}{mod}
+                          </button>
+                        </div>
                       );
                     })}
                   </div>
-                  <p className="text-[10px] text-slate-600 text-center mt-2">Click any skill to roll</p>
+                  {!editMode && <p className="text-[10px] text-slate-600 text-center mt-2">Click modifier to roll</p>}
                 </TabsContent>
 
                 {/* Attacks Tab */}
