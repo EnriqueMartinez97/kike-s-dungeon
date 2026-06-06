@@ -135,20 +135,44 @@ export default function Profile() {
             variant="outline"
             className="border-slate-600 text-slate-300 hover:text-white gap-2"
             onClick={async () => {
-              const chars = await base44.entities.Character.list();
-              if (!chars.length) return;
-              const keys = Object.keys(chars[0]).filter(k => k !== 'edit_history');
               const escape = (v) => {
                 const s = v == null ? '' : String(v);
                 return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s.replace(/"/g, '""')}"` : s;
               };
-              const rows = [keys.join(','), ...chars.map(c => keys.map(k => escape(typeof c[k] === 'object' ? JSON.stringify(c[k]) : c[k])).join(','))];
-              const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
-              const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'characters.csv'; a.click();
+              const toCSV = (rows) => {
+                if (!rows.length) return '';
+                const keys = Object.keys(rows[0]);
+                return [keys.join(','), ...rows.map(r => keys.map(k => escape(typeof r[k] === 'object' ? JSON.stringify(r[k]) : r[k])).join(','))].join('\n');
+              };
+
+              const entities = [
+                { name: 'Campaign', data: await base44.entities.Campaign.list() },
+                { name: 'Character', data: await base44.entities.Character.list() },
+                { name: 'Episode', data: await base44.entities.Episode.list() },
+                { name: 'Quest', data: await base44.entities.Quest.list() },
+                { name: 'NPC', data: await base44.entities.NPC.list() },
+                { name: 'Document', data: await base44.entities.Document.list() },
+                { name: 'Note', data: await base44.entities.Note.list() },
+                { name: 'SessionLog', data: await base44.entities.SessionLog.list() },
+                { name: 'CampaignMembership', data: await base44.entities.CampaignMembership.list() },
+                { name: 'Handout', data: await base44.entities.Handout.list() },
+                { name: 'GroupRollRequest', data: await base44.entities.GroupRollRequest.list() },
+              ];
+
+              const allCSV = entities
+                .filter(e => e.data.length > 0)
+                .map(e => `### ${e.name} ###\n${toCSV(e.data)}`)
+                .join('\n\n');
+
+              const blob = new Blob([allCSV], { type: 'text/csv' });
+              const a = document.createElement('a');
+              a.href = URL.createObjectURL(blob);
+              a.download = `kikesdungeon_export_${new Date().toISOString().slice(0,10)}.csv`;
+              a.click();
             }}
           >
             <Download className="h-4 w-4" />
-            Export Characters CSV
+            Export All Data (CSV)
           </Button>
         </CardContent>
       </Card>
