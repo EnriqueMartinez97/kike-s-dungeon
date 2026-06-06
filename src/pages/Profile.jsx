@@ -145,7 +145,11 @@ export default function Profile() {
                 return [keys.join(','), ...rows.map(r => keys.map(k => escape(typeof r[k] === 'object' ? JSON.stringify(r[k]) : r[k])).join(','))].join('\n');
               };
 
+              const currentUser = await base44.auth.me();
+              const userRow = { ...currentUser };
+
               const entities = [
+                { name: 'User', data: [userRow] },
                 { name: 'Campaign', data: await base44.entities.Campaign.list() },
                 { name: 'Character', data: await base44.entities.Character.list() },
                 { name: 'Episode', data: await base44.entities.Episode.list() },
