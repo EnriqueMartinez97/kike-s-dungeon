@@ -6,7 +6,9 @@ import {
   ArrowLeft, 
   Upload, 
   User,
-  Save
+  Save,
+  Github,
+  Download
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -115,6 +117,41 @@ export default function Profile() {
         <ArrowLeft className="h-4 w-4 mr-2" />
         Back
       </Button>
+
+      <Card className="bg-slate-900/50 border-slate-800 mb-4">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-white text-sm flex items-center gap-2">Developer Tools</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-3">
+          <Button
+            variant="outline"
+            className="border-slate-600 text-slate-300 hover:text-white gap-2"
+            onClick={() => window.open('https://github.com', '_blank')}
+          >
+            <Github className="h-4 w-4" />
+            GitHub Repository
+          </Button>
+          <Button
+            variant="outline"
+            className="border-slate-600 text-slate-300 hover:text-white gap-2"
+            onClick={async () => {
+              const chars = await base44.entities.Character.list();
+              if (!chars.length) return;
+              const keys = Object.keys(chars[0]).filter(k => k !== 'edit_history');
+              const escape = (v) => {
+                const s = v == null ? '' : String(v);
+                return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s.replace(/"/g, '""')}"` : s;
+              };
+              const rows = [keys.join(','), ...chars.map(c => keys.map(k => escape(typeof c[k] === 'object' ? JSON.stringify(c[k]) : c[k])).join(','))];
+              const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+              const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'characters.csv'; a.click();
+            }}
+          >
+            <Download className="h-4 w-4" />
+            Export Characters CSV
+          </Button>
+        </CardContent>
+      </Card>
 
       <Card className="bg-slate-900/50 border-slate-800">
         <CardHeader>
